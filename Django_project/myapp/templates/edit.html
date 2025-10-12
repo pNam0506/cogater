@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>หน้าเเรกของเว็บไซด์</title>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center">เเบบฟอร์มเเก้ไขข้อมูล</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name">ชื่อประชากร</label>
+        <input type="text" name="name" class="form-control" value="{{person.name}}">
+    </div>
+    <div class="form-group mb-3">
+        <label for="age">อายุ</label>
+        <input type="number" name="age" class="form-control" value="{{person.age}}">
+    </div>
+
+    <input type="submit" value="อัพเดตข้อมูล" class="btn btn-success">
+
+</form>
+
+{% endblock %}
