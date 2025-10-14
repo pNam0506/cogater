@@ -1,25 +1,78 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 <title>Welcome</title>
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center" style="font-family: 'IBM Plex Sans Thai', sans-serif;">Hi</h1>
-<!-- <form method="post" action="form">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="name">ชื่อประชากร</label>
-        <input type="text" name="name" class="form-control">
+<!-- 🔹 หน้าจอโหลด -->
+<div id="loader">
+    <h2>กำลังโหลด...</h2>
+    <div class="bar">
+        <div class="bar-fill"></div>
     </div>
-    <div class="form-group mb-3">
-        <label for="age">อายุ</label>
-        <input type="number" name="age" class="form-control">
-    </div>
+</div>
 
-    <input type="submit" value="บันทึกข้อมูล" class="btn btn-success">
+<!-- 🔹 เนื้อหาหลัก -->
+<div id="main-content" style="display: none;">
+    <h1 class="text-center" style="font-family: 'IBM Plex Sans Thai', sans-serif;">Cogater</h1>
+</div>
 
-</form> -->
+<style>
+    /* 🔸 หน้าจอโหลดเต็มจอ */
+    #loader {
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 9999;
+        transition: opacity 0.6s ease;
+    }
 
+    .bar {
+        width: 300px;
+        height: 30px;
+        background: #eee;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .bar-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #73dc36);
+        animation: load 2s linear forwards;
+    }
+
+    @keyframes load {
+        from { width: 0%; }
+        to { width: 100%; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+<script>
+    // 🔸 เมื่อโหลดหน้าเสร็จ
+    window.addEventListener("load", function() {
+        const loader = document.getElementById("loader");
+        const main = document.getElementById("main-content");
+
+        setTimeout(() => {
+            loader.style.opacity = "0";
+            setTimeout(() => {
+                loader.style.display = "none";
+                main.style.display = "block";
+                main.style.animation = "fadeIn 1s ease";
+            }, 600);
+        }, 2000); // แสดงโหลดประมาณ 2 วิ
+    });
+</script>
 {% endblock %}
