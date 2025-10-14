@@ -3,6 +3,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from myapp.models import Person
 from django.contrib import messages
+from time import sleep
 
 # Create your views here.
 def index(request):
@@ -55,5 +56,4 @@ def delete(request,person_id):
     return redirect("/")
 
 def loading(request):
-    all_person = Person.objects.filter(name = "น้ำ")
-    return render(request,"loading_page.html",{"all_person":all_person})
+    return render(request,"loading_page.html")

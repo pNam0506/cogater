@@ -7,5 +7,5 @@ urlpatterns = [
     path('form',views.form),
     path('edit/<person_id>',views.edit),
     path('delete/<person_id>',views.delete),
-    path('loading',views.loading)
+    path('loading/',views.loading)
 ]
