@@ -53,16 +53,17 @@
     /* ซ่อนไว้ก่อน */
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
 
 <div id="app">
-  <div  class="date" style="font-size: 24px; font-weight: bold; margin: 20px;">
+  <div class="date" style="font-size: 24px; font-weight: bold; margin: 20px;">
     Date: ${ time }
   </div>
-  
+
 
 
   <div style=" display: grid; grid-template-columns: repeat(1); gap: 10px; ">
+
     <div class="box">
 
       <div style="margin-left: 50px; ">
@@ -180,18 +181,22 @@
           <input type="file" accept=".pdf" multiple>
         </div>
 
-        <div style="margin-top: -110px; grid-column: 2/3;">
-          <label for="phone">Start</label><br>
-          <input type="date">
+
+        <div style="margin-top: -110px; grid-column: 2/3; display: grid; grid-template-columns: repeat(2, 200px);">
+          <h3>Collab date</h3>
+
+          <div style=" grid-column: 1/2">
+            <label for="phone">Start</label><br>
+            <input type="date">
+          </div>
+
+          <div style=" grid-column: 2/3">
+            <label for="phone">End</label><br>
+            <input type="date">
+
+          </div>
         </div>
 
-        
-
-        <div style="margin-top: -110px;">
-          <label for="phone">End</label><br>
-          <input type="date">
-          
-        </div>
 
 
 
@@ -208,89 +213,247 @@
 
 
     </div>
+
+    <div>
+
+      <div style="margin-left: 50px; ">
+        <h3>Items information</h3>
+      </div>
+
+
+      <div
+        style="display: grid; grid-template-columns: repeat(2, 200px); grid-template-rows: repeat(3, 100px); gap: 10px; margin-left: 5%;">
+
+        <div>
+          <label>Collab With</label><br>
+          <textarea style="padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+            placeholder="พิมพ์ข้อความที่นี่..."></textarea>
+        </div>
+
+        <div>
+          <label for="store">Product Type</label><br>
+          <select v-model="value" style="width: 200px; padding: 5px; border-radius: 5px;">
+            <option value="">All</option>
+            <option value="clothing">เสื้อผ้า</option>
+            <option value="food">อาหาร</option>
+            <option value="Electronic">เครื่องใช้ไฟฟ้า</option>
+            <option value="jiury">เครื่องประดับ</option>
+            <option value="Other">Other</option>
+
+          </select>
+
+          <input v-if="value === 'Other'" type="text" placeholder="กรอกชื่อร้านค้าอื่น ๆ">
+
+        </div>
+
+
+
+        <div class="input-group" style="grid-row: 2/3 ;">
+          <label for="picture_multi">Product Images (ใส่ได้มากกว่า 1 รูป)</label><br>
+          <input type="file" id="picture_multi" name="picture_multi" accept="image/*" style="display: none;" multiple>
+          <img id="preview_multi" style="width: 200px; height: 200px; margin-top: 10px;"
+            src="add-symbol-svgrepo-com.png">
+          <input id="change_image_multi" type="submit" value="change">
+        </div>
+
+
+        <div style="grid-row: 3/4 ; margin-top: 200px;">
+
+
+
+          <!-- <input type="text" id="colorCode" placeholder="#rrggbb" value="#ffffff"
+            style="width: 80px; margin-left: 10px;">
+
+          <input type="color" id="AddColor" value="#ffffff" style="width: 30px; height: 30px; border-radius: 100px;">
+        </div> -->
+
+          <div v-for="(color, index) in item" :key="index" style="margin-top: 10px;">
+            <input v-model="item[index]" type="text" style="width: 80px; margin-right: 5px;">
+            <input v-model="item[index]" type="color" style="width: 30px; height: 30px; border-radius: 100px;">
+            <button @click="removeColor(index)">❌</button>
+          </div>
+
+          <svg @click="addColor" width="50px" height="50px" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM12.75 9C12.75 8.58579 12.4142 8.25 12 8.25C11.5858 8.25 11.25 8.58579 11.25 9L11.25 11.25H9C8.58579 11.25 8.25 11.5858 8.25 12C8.25 12.4142 8.58579 12.75 9 12.75H11.25V15C11.25 15.4142 11.5858 15.75 12 15.75C12.4142 15.75 12.75 15.4142 12.75 15L12.75 12.75H15C15.4142 12.75 15.75 12.4142 15.75 12C15.75 11.5858 15.4142 11.25 15 11.25H12.75V9Z"
+                fill="#1C274C"></path>
+            </g>
+          </svg>
+
+        </div>
+
+
+
+
+
+
+
+
+
+      </div>
+
+    </div>
+
   </div>
 
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      delimiters: ['${', '}'], // ใช้ ${ ... } แทน {{ ... }} เพื่อไม่ชนกับ Django
+      data() {
+        return {
+          Default_item_params: {
+            color:'',
+            Company_name:'',
+            store:'',
+            Company_Address:'',
+            Operator_Name:'',
+            Phone:'',
+          },
+          params: {},
+          time: '{{ current_time }}',
+          value: '',
+          item: []
+        }
+      },
+      methods: {
+        updateClock() {
+          const now = new Date();
+          this.time = now.toLocaleTimeString('th-TH', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+        },
+        addColor() {
+          this.item.push('#ffffff'); // เพิ่มสีใหม่ใน array
+        },
+        removeColor(index) {
+          this.item.splice(index, 1); // ลบสีออก
+        }
+      },
+      mounted() {
+        this.updateClock();
+        setInterval(this.updateClock, 1000);
+      },
 
-<script>
-  new Vue({
-    el: '#app',
-    delimiters: ['${', '}'], // ใช้ ${ ... } แทน {{ ... }} เพื่อไม่ชนกับ Django
-    data: {
-      time: '{{ current_time }}',
-      value: ''
-    },
-    methods: {
-      updateClock() {
-        const now = new Date();
-        this.time = now.toLocaleTimeString('th-TH', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
+
+    });
+
+    const phone = document.getElementById('phone');
+    const error = document.getElementById('error');
+
+    phone.addEventListener('keydown', function (event) {
+      const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
+
+      // อนุญาตเฉพาะตัวเลขหรือปุ่มพิเศษ
+      if ((event.key >= '0' && event.key <= '9') || allowedKeys.includes(event.key)) {
+        error.style.display = 'none'; // ซ่อนข้อความเตือนเมื่อพิมพ์ถูก
+        return;
+      } else {
+        event.preventDefault(); // บล็อกตัวอักษรที่ไม่ใช่ตัวเลข
+        error.style.display = 'block'; // แสดงข้อความเตือน
       }
-    },
-    mounted() {
-      this.updateClock();
-      setInterval(this.updateClock, 1000);
-    }
-  });
+    });
 
-  const phone = document.getElementById('phone');
-  const error = document.getElementById('error');
+    const pictureInput_multi = document.getElementById('picture_multi');
+    const preview_multi = document.getElementById('preview_multi');
 
-  phone.addEventListener('keydown', function (event) {
-    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
-
-    // อนุญาตเฉพาะตัวเลขหรือปุ่มพิเศษ
-    if ((event.key >= '0' && event.key <= '9') || allowedKeys.includes(event.key)) {
-      error.style.display = 'none'; // ซ่อนข้อความเตือนเมื่อพิมพ์ถูก
-      return;
-    } else {
-      event.preventDefault(); // บล็อกตัวอักษรที่ไม่ใช่ตัวเลข
-      error.style.display = 'block'; // แสดงข้อความเตือน
-    }
-  });
-
-  const pictureInput = document.getElementById('picture');
-  const preview = document.getElementById('preview');
-
-  pictureInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.style.display = 'block';
+    pictureInput_multi.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview_multi.src = e.target.result;
+          preview_multi.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      } else {
+        preview_multi.style.display = 'none';
       }
-      reader.readAsDataURL(file);
-    } else {
-      preview.style.display = 'none';
-    }
-  });
+    });
+
+    const pictureInput = document.getElementById('picture');
+    const preview = document.getElementById('preview');
+
+    pictureInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+
+    preview_multi.addEventListener('click', () => {
+      modalImg.src = preview_multi.src;
+      modal.style.display = 'flex';
+    });
 
 
 
-  const change_image = document.getElementById('change_image');
+    const change_image = document.getElementById('change_image');
 
-  change_image.addEventListener('click', () => pictureInput.click())
+    change_image.addEventListener('click', () => pictureInput.click())
 
-  const modal = document.getElementById('modal');
-  const modalImg = document.getElementById('modalImg');
-  const closeModal = document.getElementById('closeModal');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const closeModal = document.getElementById('closeModal');
 
 
-  // คลิกที่ preview เพื่อเปิด modal
-  preview.addEventListener('click', () => {
-    modalImg.src = preview.src;
-    modal.style.display = 'flex';
-  });
 
-  // ปิด modal
-  closeModal.addEventListener('click', () => modal.style.display = 'none');
-  modal.addEventListener('click', e => {
-    if (e.target === modal) modal.style.display = 'none';
-  });
+    // คลิกที่ preview เพื่อเปิด modal
+    preview.addEventListener('click', () => {
+      modalImg.src = preview.src;
+      modal.style.display = 'flex';
+    });
 
-</script>
-{% endblock %}
+    // ปิด modal
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+
+    const change_image_multi = document.getElementById('change_image_multi');
+
+    change_image_multi.addEventListener('click', () => pictureInput_multi.click())
+
+    // const AddColor = document.getElementById('AddColor');
+    // const AddButton = document.getElementById('Add_button');
+    // const colorCode = document.getElementById('colorCode');
+
+
+
+    // AddButton.addEventListener('click', () => {
+    //   const color = AddColor.value; // ดึงค่าสีจาก input
+    //   console.log('เลือกสี:', color);
+    // });
+
+    // AddColor.addEventListener('input', () => {
+    //   colorCode.value = AddColor.value; // อัปเดตช่อง text ให้ตรงกัน
+    // });
+
+    // colorCode.addEventListener('input', () => {
+    //   const val = colorCode.value;
+    //   // ตรวจสอบว่ารหัสสีถูกต้อง (# + 6 ตัว hex)
+    //   if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    //     AddColor.value = val; // อัปเดต color picker ให้ตรงกัน
+    //   }
+    // });
+
+    // AddButton.addEventListener('click', () =>
+    //   AddColor.click()
+    // );
+  </script>
+  {% endblock %}
