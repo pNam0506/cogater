@@ -52,6 +52,10 @@
     display: none;
     /* ซ่อนไว้ก่อน */
   }
+
+  table thead tr {
+    background-color: #e61b40 !important;
+  }
 </style>
 
 
@@ -283,7 +287,7 @@
 
         </div>
 
-        <div style="grid-row: 4/5 ; grid-column: 1/2; margin-top: 200px;">
+        <div style="grid-row: 4/5 ; grid-column: 1/2; margin-top: 50px;">
           <label>Product Detail</label>
           <textarea placeholder="Detail" style="width: 200px; height: 100px;">
           </textarea>
@@ -340,11 +344,10 @@
             <div>
               <label>Color</label><br>
 
-              <input v-model="item_params.Color" type="color"
+              <input v-model="Color[index]" type="color"
                 style="width: 30px; height: 30px; border-radius: 100px; margin-right: 5px;">
-              <input v-model="item_params.Color" type="text" style="width: 80px; margin-right: 5px;"
-                placeholder="#ffffff">
-              
+              <input v-model="Color[index]" type="text" style="width: 80px; margin-right: 5px;" placeholder="#000000">
+
               <!-- <button @click="removeColor(index)" style="border: none; background: none; cursor: pointer;">
                 ❌
               </button> -->
@@ -376,35 +379,43 @@
         </div>
       </div>
 
-      <input type="button" value="Add"
+      <input type="button" value="+"
         style="width: 100%; height: 50px; background-color: gray; border-radius: 20px; border: none; color: white;"
         @click="AddList" />
 
-      <div class="mb-10 items-center justify-between">
-        <div class="grid grid-cols-1 mt-5">
+      <!-- <div style="display: flex; justify-content: flex-end;">
+        <input type="button" value="Add"
+          style="margin-top: 5px; background-color: greenyellow; width: 100px; border-radius: 10px; border: none;"
+          @click="AddTable" />
+      </div> -->
 
-          <div>
-
-            <v-card>
-
-              <v-data-table :headers="teble_header" :items="item">
-                <template v-slot:item.no="{ item }">
-                  ${ item.indexOf(item) +1}
-                </template>
-
-
-
-
-              </v-data-table>
-            </v-card>
-
-
+      <template>
+        <div>
+          <!-- ปุ่ม Add อยู่ขวาสุด -->
+          <div style="display: flex; justify-content: flex-end;">
+            <input type="button" value="Add"
+              style="background-color: greenyellow; border-radius: 5px; margin-top: 10px; padding: 8px 16px; cursor: pointer;"
+              @click="AddtoTable" />
           </div>
 
+          <!-- ตาราง -->
+          <v-card class="mt-4">
+            <v-data-table :headers="table_header" :items="item" class="elevation-2" density="comfortable">
+              <!-- ช่องลำดับ -->
+              <template v-slot:item.no="{ index }">
+                ${ index + 1 }
+              </template>
+
+              <!-- ช่องปุ่มลบ -->
+              <template v-slot:item.actions="{ index }">
+                <v-btn color="red" variant="text" @click="deleteRow(index)">
+                  ลบ
+                </v-btn>
+              </template>
+            </v-data-table>
+          </v-card>
         </div>
-
-
-      </div>
+      </template>
 
     </div>
 
@@ -415,14 +426,15 @@
     new Vue({
       el: '#app',
       delimiters: ['${', '}'], // ใช้ ${ ... } แทน {{ ... }} เพื่อไม่ชนกับ Django
+      
       data: {
 
-        teble_header: [
-
-          { text: '#', value: 'no', width: "5%", sortable: false },
-          { text: '#', value: 'no', width: "5%", sortable: false },
-
-
+        table_header: [
+          { text: 'No', value: 'no', align: 'start' },
+          { text: 'Size', value: 'size' },
+          { text: 'Detail', value: 'Size_Detail' },
+          { text: 'Price', value: 'Price' },
+          { text: 'Actions', value: 'actions', sortable: false }
         ],
 
         Default_item_params: {
@@ -435,15 +447,12 @@
         },
 
         item_params: {
-          Color: '#ffffff',
+          Color: '',
           size: '',
           Size_Detail: '',
           Price: '',
 
         },
-
-
-
 
         product: [],
         params: [],
@@ -466,25 +475,47 @@
         },
         addColor() {
           const newColor = '#ffffff'; // สีใหม่เริ่มต้น
-          this.item_params.Color = newColor;
+          this.Color = newColor;
         },
         removeColor(index) {
           this.Color.splice(index, 1);
           this.params.splice(index, 1);
         },
-        SaveColor() {
-          if (this.params.length >= 0) {
-            this.showColors = true; // แสดงสีเมื่อกด save
-            this.item = [...this.params]; // คัดลอกค่าทั้งหมดจาก params ไปใส่ใน item
-          } else {
-            alert('ยังไม่มีสีให้บันทึกนะคั้บ');
-          }
-        },
+        // SaveColor() {
+
+          
+        //   if (this.params.length >= 0) {
+        //     this.showColors = true; // แสดงสีเมื่อกด save
+        //     this.item = [...this.params]; // คัดลอกค่าทั้งหมดจาก params ไปใส่ใน item
+        //   } else {
+        //     alert('ยังไม่มีสีให้บันทึกนะคั้บ');
+        //   }
+        // },
         AddList() {
           this.AddItem = true;
           // push สำเนาใหม่ของ item_params เพื่อแยกแต่ละรายการ
           this.product.push({ ...this.item_params });
         },
+        AddtoTable() {
+          this.$http.post('report/',{
+                            'po_no':this.params.po_no,
+                            'store_code':this.default_storecode,
+                            'po_date':this.params.po_date,
+                            'supplier':this.params.supplier,
+                            'dt_set': this.datas_select_items
+                        }, config)
+          // เพิ่มข้อมูลใหม่ (จำลองตัวอย่าง)
+          const newItem = {
+            size: this.item_params.size || 'M',
+            Size_Detail: this.item_params.Size_Detail || 'Sample detail',
+            Price: this.item_params.Price || '200'
+          };
+          this.item.push(newItem);
+        },
+        deleteRow(index) {
+          this.item.splice(index, 1);
+        },
+
         removeItem(index) {
           this.product.splice(index, 1);
         },
