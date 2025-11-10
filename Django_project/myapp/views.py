@@ -1,13 +1,15 @@
 from django.shortcuts import render,redirect
 #ส่งข้อความตอบกลับไปยังหน้าเว็บ
 from django.http import HttpResponse
-from myapp.models import Person, User
+from .models import Person, User
 from django.contrib import messages
 from time import sleep
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, get_object_or_404
 # from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password  # ใช้เข้ารหัสรหัสผ่าน
 
 
 # Create your views here.
@@ -61,64 +63,70 @@ def delete(request,person_id):
     return redirect("/")
 
 def loading(request, username):
-    user = get_object_or_404(User, username=username)
-    return render(request, "loading_page.html", {"user_profile": user})
+    if request.user.is_authenticated:  # ตรวจว่ามีการล็อกอินอยู่ไหม
+        username = request.user.username
+        email = request.user.email
+        # image = request.user.image.url if request.user.image else None
+        return render(request, "loading_page.html", {
+            "username": username,
+            "email": email,
+            # "image": image
+        })
+    else:
+        return redirect("login")
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
+
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
 def loginView(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, f"ยินดีต้อนรับ {username}!")
-                return redirect("user_profile", username=user.username)  # เปลี่ยน 'home' เป็นชื่อหน้าเว็บที่ต้องการไปหลังล็อกอิน
-            else:
-                messages.error(request, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # ล็อกอินสำเร็จ
+            login(request, user)
+            messages.success(request, f"ยินดีต้อนรับกลับนะ {username} 💕")
+            return redirect("user_profile", username=user.username) # เปลี่ยน 'home' เป็นหน้าที่ต้องการหลังล็อกอิน
         else:
-            messages.error(request, "กรุณากรอกข้อมูลให้ถูกต้อง")
-    else:
-        form = AuthenticationForm()
-    return render(request, "login.html", {"form": form})
+            # ล็อกอินไม่สำเร็จ
+            messages.error(request, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องนะคั้บ 😿")
+            return redirect("login")
+
+    return render(request, "login.html")
+
 
 
 def authView(request):
-    # if request.method == "POST":
-    #     form = UserCreationForm(request.POST or None)
-    #     if form.is_valid():
-    #         form.save()
-    # else:
-    #     form = UserCreationForm()
-    # return render(request, "signup.html", {"form": form})
     if request.method == "POST":
-        #รับข้อมูล
-        username = request.POST["username"]
-        email = request.POST["email"]
+        # รับข้อมูลจากฟอร์ม
+        username = request.POST.get("username")
+        email = request.POST.get("email")
         image = request.FILES.get("image")
-        password = request.POST["password"]
-       
-        #บันทึกข้อมูล
+        password = request.POST.get("password")
+
+        # ตรวจว่าชื่อผู้ใช้ซ้ำไหม
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "มีชื่อผู้ใช้นี้อยู่แล้วคั้บ ลองเปลี่ยนชื่อดูน้า")
+            return redirect("signup")
+
+        # เข้ารหัสรหัสผ่านก่อนบันทึก
+        hashed_password = make_password(password)
+
+        # บันทึกข้อมูล
         user = User.objects.create(
-            username = username,
-            email  = email,
-            image = image,
-            password = password
-
-
+            username=username,
+            email=email,
+            image=image,
+            password=hashed_password
         )
-        user.save()
-        messages.success(request,"บันทึกข้อมูลเรียบร้อย")
-        #เปลี่ยนเส้นทาง
-        return redirect("user_profile", username=user.username)  # เปลี่ยน 'home' เป็นชื่อหน้าเว็บที่ต้องการไปหลังล็อกอิน
 
+        messages.success(request, "สมัครสมาชิกเรียบร้อยแล้วคั้บ 🎉")
+        return redirect("user_profile", username=user.username)  # ไปหน้าโปรไฟล์หลังสมัคร
 
-    else:
-
-        return render(request,"signup.html")
+    return render(request, "signup.html")
