@@ -10,8 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password  # ใช้เข้ารหัสรหัสผ่าน
-
-
+from django.contrib.auth.hashers import check_password
 # Create your views here.
 def index(request):
     all_person = Person.objects.filter(name = "น้ำ")
@@ -63,17 +62,17 @@ def delete(request,person_id):
     return redirect("/")
 
 def loading(request, username):
-    if request.user.is_authenticated:  # ตรวจว่ามีการล็อกอินอยู่ไหม
-        username = request.user.username
-        email = request.user.email
-        # image = request.user.image.url if request.user.image else None
+    
+    user = User.objects.filter(username=username).first()
+
+    if user:
+        image = user.image.url if hasattr(user, "image") and user.image else None
+
         return render(request, "loading_page.html", {
             "username": username,
-            "email": email,
-            # "image": image
+            "image": image
         })
-    else:
-        return redirect("login")
+   
 
 from django.shortcuts import render, redirect
 
@@ -85,14 +84,13 @@ def loginView(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        # ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
-        user = authenticate(request, username=username, password=password)
+        user = User.objects.filter(username=username).first()
 
-        if user is not None:
-            # ล็อกอินสำเร็จ
-            login(request, user)
-            messages.success(request, f"ยินดีต้อนรับกลับนะ {username} 💕")
-            return redirect("user_profile", username=user.username) # เปลี่ยน 'home' เป็นหน้าที่ต้องการหลังล็อกอิน
+        # ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
+        if user and check_password(password, user.password):
+            messages.success(request, "ยินดีต้อนรับ", username)
+            return redirect("user_profile", username=username)
+
         else:
             # ล็อกอินไม่สำเร็จ
             messages.error(request, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องนะคั้บ 😿")

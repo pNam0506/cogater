@@ -30,4 +30,13 @@
 
     <button type="submit">Submit</button>
 </form>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}
