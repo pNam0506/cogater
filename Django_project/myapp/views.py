@@ -63,7 +63,7 @@ def delete(request,person_id):
 
 def loading(request, username):
     
-    user = User.objects.filter(username=username).first()
+    user = User.objects.filter(username=username)
 
     if user:
         image = user.image.url if hasattr(user, "image") and user.image else None
@@ -72,7 +72,26 @@ def loading(request, username):
             "username": username,
             "image": image
         })
-   
+
+def info(request, username):
+
+    users = User.objects.filter(username=username)
+
+    user_list = []
+    for u in users:
+        image = u.image.url if hasattr(u, "image") and u.image else None
+        
+        user_list.append({
+            "username": u.username,
+            "email": u.email,
+            "image": image,
+        })
+
+    return render(request, "loading_page.html", {
+        "users": user_list,
+        "image": image,
+    })
+
 
 from django.shortcuts import render, redirect
 

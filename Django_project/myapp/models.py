@@ -7,7 +7,7 @@ class  Person(models.Model):
     age = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
-#เเปลง object เป็น string
+    #เเปลง object เป็น string
     def __str__(self):
         return self.name + "," + str(self.age)
 
@@ -17,4 +17,6 @@ class User(models.Model):
     email = models.CharField(max_length=100)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)  # ← ฟิลด์เก็บรูป
     password = models.CharField(max_length=100)
-
+    
+    def __str__(self):
+        return self.username
