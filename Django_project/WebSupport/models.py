@@ -4,6 +4,13 @@ from django.db import models
 
 class Company(models.Model):
     name = models.CharField(max_length=255)
+    store = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    website = models.URLField()
+    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
+    
 class Product(models.Model):
     
     company = models.ForeignKey(Company, on_delete=models.CASCADE)

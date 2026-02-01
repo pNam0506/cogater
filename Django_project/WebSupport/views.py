@@ -9,11 +9,11 @@ from .models import Company, Product
 def WebSupport(request):
     return render(request,"home.html")
 
-def report(request):
+def info_comp(request):
     
     thailand_tz = pytz.timezone("Asia/Bangkok")
     current_time = datetime.now(thailand_tz).strftime("%H:%M:%S")
-    return render(request, "report.html", {"current_time": current_time})
+    return render(request, "info_comp.html", {"current_time": current_time})
 
 
 # def save_company(request):

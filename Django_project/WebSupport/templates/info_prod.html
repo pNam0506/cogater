@@ -8,7 +8,7 @@
 <style>
   .box {
     width: 100%;
-    height: 400px;
+    height: 700px;
     background-color: rgb(255, 255, 255);
     border-radius: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -89,13 +89,40 @@
             placeholder="สาขา..."></textarea>
         </div>
 
-        <div>
-          <label>Company Address</label><br>
+        <div class="input-group" style="grid-row: 2/3 ;">
+          <label for="picture_multi">logo</label><br>
+          <input type="file" id="picture_multi" name="picture_multi" accept="image/*" style="display: none;" multiple>
+          <img id="preview_multi" style="width: 200px; height: 200px; margin-top: 10px;"
+            src="add-symbol-svgrepo-com.png">
+          <input id="change_image_multi" type="submit" value="change">
         </div>
+
         <div>
-          <textarea style="width: 300px; height: 100px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
-            placeholder="ที่อยู่บริษัท..."></textarea>
+            <div>
+              <label>Company Address</label><br>
+            </div>
+            <div>
+              <textarea style="width: 300px; height: 100px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+              placeholder="ที่อยู่บริษัท..."></textarea>
+            </div>
+
         </div>
+
+        <div>
+          <label>Email</label><br>
+          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+            placeholder="ชื่อผู้ติดต่อส่วนกลาง..."></textarea>
+        </div>
+
+        <div>
+          <label for="phone">Website</label>
+          {% comment %} <input style="border-radius: 10px;" type="tel" id="phone" name="phone" placeholder="กรอกเบอร์โทรศัพท์"
+            pattern="^0[0-9]{9}$" title="กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เช่น 0812345678)" maxlength="10" required>
+          <span id="error" class="error">กรอกได้เฉพาะตัวเลขเท่านั้น</span> {% endcomment %}
+          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+            placeholder="ชื่อผู้ติดต่อส่วนกลาง..."></textarea>
+        </div>
+
 
         <div>
           <label>Operator Name</label><br>
@@ -109,6 +136,8 @@
             pattern="^0[0-9]{9}$" title="กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เช่น 0812345678)" maxlength="10" required>
           <span id="error" class="error">กรอกได้เฉพาะตัวเลขเท่านั้น</span>
         </div>
+
+        
 
 
 
