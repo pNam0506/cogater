@@ -58,7 +58,8 @@
   }
 </style>
 
-
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
 <div id="app">
   <div class="date" style="font-size: 24px; font-weight: bold; margin: 20px;">
     Date: ${ time }
@@ -79,13 +80,13 @@
 
         <div>
           <label>Company Name</label><br>
-          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+          <textarea name="name" style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
             placeholder="พิมพ์ข้อความที่นี่..."></textarea>
         </div>
 
         <div>
           <label>Store</label><br>
-          <textarea style="width: 300px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+          <textarea name="store" style="width: 300px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
             placeholder="สาขา..."></textarea>
         </div>
 
@@ -107,7 +108,7 @@
               <label>Company Address</label><br>
             </div>
             <div>
-              <textarea style="width: 300px; height: 100px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+              <textarea name="address" style="width: 300px; height: 100px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
               placeholder="ที่อยู่บริษัท..."></textarea>
             </div>
 
@@ -115,23 +116,20 @@
 
         <div>
           <label>Email</label><br>
-          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+          <textarea name="email" style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
             placeholder="ชื่อผู้ติดต่อส่วนกลาง..."></textarea>
         </div>
 
         <div>
-          <label for="phone">Website</label>
-          {% comment %} <input style="border-radius: 10px;" type="tel" id="phone" name="phone" placeholder="กรอกเบอร์โทรศัพท์"
-            pattern="^0[0-9]{9}$" title="กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เช่น 0812345678)" maxlength="10" required>
-          <span id="error" class="error">กรอกได้เฉพาะตัวเลขเท่านั้น</span> {% endcomment %}
-          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+          <label>Website</label>
+          <textarea name="website" style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
             placeholder="ชื่อผู้ติดต่อส่วนกลาง..."></textarea>
         </div>
 
 
         <div>
           <label>Operator Name</label><br>
-          <textarea style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
+          <textarea name="operator" style="width: 200px; height: 50px; padding-inline-start: 0; resize: none; white-space: pre-wrap;"
             placeholder="ชื่อผู้ติดต่อส่วนกลาง..."></textarea>
         </div>
 
@@ -153,307 +151,8 @@
         <input type="submit" value="Save" style="position: relative; margin-left: 1000px; width: 100px;">
       </div>
 
-
-
-
-
-
     </div>
-
-    {% comment %} <div class="box" style="display:none">
-
-      <div style="margin-left: 50px; ">
-        <h3>Promote Information</h3>
-      </div>
-
-
-      <div
-        style="display: grid; grid-template-columns: 200px 200px 200px; grid-template-rows: 200px 100px; gap: 10px; margin-left: 25%;">
-
-        <div class="input-group" style="grid-row: 1/3 ;">
-          <label for="picture">Ads image (รูปจะถูกโปรโมทหน้าเว็บ)</label><br>
-          <input type="file" id="picture" name="picture" accept="image/*" style="display: none;">
-          <img id="preview" style="width: 200px; height: 200px; margin-top: 10px;" src="add-symbol-svgrepo-com.png">
-          <input id="change_image" type="submit" value="change">
-        </div>
-
-        <div id="modal" style="
-     display:none; 
-     position:fixed; 
-     top:0; left:0; width:100%; height:100%; 
-     background:rgba(0,0,0,0.8); 
-     justify-content:center; align-items:center;">
-          <span id="closeModal" style="
-        position:absolute; top:20px; right:30px; color:white; font-size:30px; cursor:pointer;">&times;</span>
-          <img id="modalImg" src="" style="max-width:90%; max-height:90%; border-radius:10px;">
-        </div>
-
-
-
-        <div>
-          <label for="store">Collab type</label><br>
-          <select v-model="value" style="width: 200px; padding: 5px; border-radius: 5px;">
-            <option value="">All</option>
-            <option value="snack">การ์ตูน</option>
-            <option value="utility">อนิเมะ</option>
-            <option value="clothing">หนัง</option>
-            <option value="game">เกม</option>
-            <option value="Other">Other</option>
-
-          </select>
-
-          <input v-if="value === 'Other'" type="text" placeholder="กรอกชื่อร้านค้าอื่น ๆ">
-
-        </div>
-
-
-
-        <div>
-          <label>Collab With</label><br>
-          <textarea style="padding-inline-start: 0; resize: none; white-space: pre-wrap;"
-            placeholder="พิมพ์ข้อความที่นี่..."></textarea>
-        </div>
-
-        <div style="margin-top: -100px; grid-column: 2/4;">
-          <label>Import License file</label><br>
-          <input type="file" accept=".pdf" multiple>
-        </div>
-
-
-        <div style="margin-top: -110px; grid-column: 2/3; display: grid; grid-template-columns: repeat(2, 200px);">
-          <h3>Collab date</h3>
-
-          <div style=" grid-column: 1/2">
-            <label for="phone">Start</label><br>
-            <input type="date">
-          </div>
-
-          <div style=" grid-column: 2/3">
-            <label for="phone">End</label><br>
-            <input type="date">
-
-          </div>
-        </div>
-
-
-
-
-
-      </div>
-
-      <div>
-        <input type="submit" value="Save" style="position: relative; margin-left: 1000px; width: 100px;">
-      </div>
-
-
-
-
-
-
-    </div>
-
-    <div>
-
-      <div style="margin-left: 50px; ">
-        <h3>Items information</h3>
-      </div>
-
-
-      <div
-        style="display: grid; grid-template-columns: repeat(2, 250px); grid-template-rows: repeat(3, 100px); gap: 10px; margin-left: 5%;">
-
-        <div>
-          <label>Collab With</label><br>
-          <textarea style="padding-inline-start: 0; resize: none; white-space: pre-wrap;"
-            placeholder="พิมพ์ข้อความที่นี่..."></textarea>
-        </div>
-
-        <div>
-          <label for="store">Product Type</label><br>
-          <select v-model="value" style="width: 200px; padding: 5px; border-radius: 5px;">
-            <option value="">All</option>
-            <option value="clothing">เสื้อผ้า</option>
-            <option value="food">อาหาร</option>
-            <option value="Electronic">เครื่องใช้ไฟฟ้า</option>
-            <option value="jiury">เครื่องประดับ</option>
-            <option value="Other">Other</option>
-
-          </select>
-
-          <input v-if="value === 'Other'" type="text" placeholder="กรอกชื่อร้านค้าอื่น ๆ">
-
-        </div>
-
-
-
-        <div class="input-group" style="grid-row: 2/3 ;">
-          <label for="picture_multi">Product Images (ใส่ได้มากกว่า 1 รูป)</label><br>
-          <input type="file" id="picture_multi" name="picture_multi" accept="image/*" style="display: none;" multiple>
-          <img id="preview_multi" style="width: 200px; height: 200px; margin-top: 10px;"
-            src="add-symbol-svgrepo-com.png">
-          <input id="change_image_multi" type="submit" value="change">
-        </div>
-
-
-        <div style="grid-row: 3/4 ;grid-column: 1/2; margin-top: 200px;">
-
-
-
-          <!-- <input type="text" id="colorCode" placeholder="#rrggbb" value="#ffffff"
-              style="width: 80px; margin-left: 10px;">
-
-            <input type="color" id="AddColor" value="#ffffff" style="width: 30px; height: 30px; border-radius: 100px;">
-          </div> -->
-
-
-
-
-          <div v-if="showColors" v-for="(color, index) in item" :key="index"
-            style="display: flex; align-items: center;">
-            <span style="margin-right: 5px;">${ index + 1 }.</span>
-            <span style="margin-right: 5px; ">${ item[index] }</span>
-            <input v-model="item[index]" type="color"
-              style="width: 30px; height: 30px; border-radius: 100px; margin-right: 5px;" disabled>
-          </div>
-
-
-
-
-        </div>
-
-        <div style="grid-row: 4/5 ; grid-column: 1/2; margin-top: 50px;">
-          <label>Product Detail</label>
-          <textarea placeholder="Detail" style="width: 200px; height: 100px;">
-          </textarea>
-        </div>
-
-      </div>
-
-
-
-      <!-- ฟอร์มสินค้าแต่ละตัว -->
-      <div v-if="AddItem">
-        <div v-for="(item, index) in product" :key="index"
-          style="display: grid; grid-template-columns: repeat(3, 250px); grid-template-rows: repeat(3, 100px); gap: 10px; margin-left: 5%; border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
-
-          <!-- รูปภาพ -->
-          <div style="grid-row: 1/2; grid-column: 1/2;">
-            <label>Item ${index + 1}</label><br>
-            <input type="file" :id="'picture_size_' + index" accept="image/*" multiple
-              @change="previewImage($event, index)" style="display: none;">
-            <img :id="'preview_size_' + index" style="width: 200px; height: 200px; margin-top: 10px; cursor: pointer;"
-              src="add-symbol-svgrepo-com.png" @click="document.getElementById('picture_size_' + index).click()">
-          </div>
-
-          <!-- Size -->
-          <div style="grid-row: 1/2; grid-column: 2/3;">
-            <label>Size</label><br>
-            <label><input type="radio" value="S" v-model="item.size"> S</label>
-            <label><input type="radio" value="M" v-model="item.size"> M</label>
-            <label><input type="radio" value="L" v-model="item.size"> L</label>
-            <label><input type="radio" value="XL" v-model="item.size"> XL</label>
-            <label><input type="radio" value="2XL" v-model="item.size"> 2XL</label>
-            <label><input type="radio" value="3XL" v-model="item.size"> 3XL</label>
-            <label>
-              <input type="radio" value="other" v-model="item.size">
-              <input v-if="item.size === 'other'" type="text" placeholder="ระบุไซซ์เอง" v-model="item.custom_size">
-            </label>
-          </div>
-
-          <div style="display: flex; align-items: center;">
-
-            <!-- <div>
-              <svg @click="addColor" width="50px" height="50px" viewBox="0 0 24 24" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                <g id="SVGRepo_iconCarrier">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM12.75 9C12.75 8.58579 12.4142 8.25 12 8.25C11.5858 8.25 11.25 8.58579 11.25 9L11.25 11.25H9C8.58579 11.25 8.25 11.5858 8.25 12C8.25 12.4142 8.58579 12.75 9 12.75H11.25V15C11.25 15.4142 11.5858 15.75 12 15.75C12.4142 15.75 12.75 15.4142 12.75 15L12.75 12.75H15C15.4142 12.75 15.75 12.4142 15.75 12C15.75 11.5858 15.4142 11.25 15 11.25H12.75V9Z"
-                    fill="#1C274C"></path>
-                </g>
-              </svg>
-            </div> -->
-
-            <div>
-              <label>Color</label><br>
-
-              <input v-model="Color[index]" type="color"
-                style="width: 30px; height: 30px; border-radius: 100px; margin-right: 5px;">
-              <input v-model="Color[index]" type="text" style="width: 80px; margin-right: 5px;" placeholder="#000000">
-
-              <!-- <button @click="removeColor(index)" style="border: none; background: none; cursor: pointer;">
-                ❌
-              </button> -->
-            </div>
-
-            <!-- <div>
-              <input type="submit" value="save" @click="SaveColor">
-            </div> -->
-
-          </div>
-
-          <!-- รายละเอียดสินค้า -->
-          <div style="grid-row: 2/3; grid-column: 2/3;">
-            <label>Product Detail</label>
-            <textarea placeholder="Detail" v-model="item.Size_Detail"></textarea>
-          </div>
-
-          <!-- ราคา -->
-          <div style="grid-row: 2/3; grid-column: 3/3; width: 150px;">
-            <label>Price</label>
-            <textarea placeholder="Price" v-model="item.Price"></textarea>
-          </div>
-
-          <!-- ปุ่มลบ -->
-          <div style="grid-row: 3/4; grid-column: 3/4;">
-            <button @click="removeItem(index)"
-              style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 10px;">ลบ</button>
-          </div>
-        </div>
-      </div>
-
-      <input type="button" value="+"
-        style="width: 100%; height: 50px; background-color: gray; border-radius: 20px; border: none; color: white;"
-        @click="AddList" />
-
-      <!-- <div style="display: flex; justify-content: flex-end;">
-        <input type="button" value="Add"
-          style="margin-top: 5px; background-color: greenyellow; width: 100px; border-radius: 10px; border: none;"
-          @click="AddTable" />
-      </div> -->
-
-      <template>
-        <div>
-          <!-- ปุ่ม Add อยู่ขวาสุด -->
-          <div style="display: flex; justify-content: flex-end;">
-            <input type="button" value="Add"
-              style="background-color: greenyellow; border-radius: 5px; margin-top: 10px; padding: 8px 16px; cursor: pointer;"
-              @click="AddtoTable" />
-          </div>
-
-          <!-- ตาราง -->
-          <v-card class="mt-4">
-            <v-data-table :headers="table_header" :items="item" class="elevation-2" density="comfortable">
-              <!-- ช่องลำดับ -->
-              <template v-slot:item.no="{ index }">
-                ${ index + 1 }
-              </template>
-
-              <!-- ช่องปุ่มลบ -->
-              <template v-slot:item.actions="{ index }">
-                <v-btn color="red" variant="text" @click="deleteRow(index)">
-                  ลบ
-                </v-btn>
-              </template>
-            </v-data-table>
-          </v-card>
-        </div>
-      </template>
-
-    </div>
-
-  </div> {% endcomment %}
+  </form>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script>
