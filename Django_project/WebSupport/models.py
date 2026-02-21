@@ -12,8 +12,8 @@ class sign_com(models.Model):
 
 class Company(models.Model):
     
-    company = models.ForeignKey(sign_com, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    company_id = models.ForeignKey(sign_com, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     store = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     email = models.EmailField()

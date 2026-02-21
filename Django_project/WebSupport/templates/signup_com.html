@@ -3,7 +3,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>สมัครสมาชิก</h2>
+<h2>สมัครสมาชิก ร้านค้า</h2>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div
@@ -17,22 +17,22 @@
 
                 <div>
                     <label>Username</label><br>
-                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="text" name="username_com" placeholder="Username" required>
                 </div>
 
                 <div>
                     <label>Email</label><br>
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="email" name="email_com" placeholder="Email" required>
                 </div>
 
                 <div>
                     <label>Profile</label><br>
-                    <input type="file" name="image">
+                    <input type="file" name="image_com">
                 </div>
 
                 <div>
                     <label>Password</label><br>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <input type="password" name="password_com" placeholder="Password" required>
                 </div>
 
                 <button type="submit">Submit</button>

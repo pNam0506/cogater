@@ -15,8 +15,43 @@
     <h1 class="text-center" style="font-family: 'IBM Plex Sans Thai', sans-serif;">WebSupport</h1>
 </div>
 
-<div class="menu">
-    <a href="info_comp"><button>Report</button></a>
+<div>
+
+    
+    <div class="menu">
+        <a href="info_comp"><button>Report</button></a>
+
+    </div>
+
+    <h2>Product List</h2>
+
+<table border="1">
+
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Description</th>
+    </tr>
+
+    {% for product in products %}
+
+    <tr>
+
+        <td>{{ product.id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.description }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+    
+
 
 </div>
 
