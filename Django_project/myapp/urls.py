@@ -9,6 +9,6 @@ urlpatterns = [
     path('delete/<person_id>',views.delete),
     path('home/<str:username>/',views.info, name='user_profile'),
     path('login/', views.loginView, name="login"),
-    path('signup', views.authView, name='signup'),
+    path('signup/', views.authView, name='signup'),
    
 ]

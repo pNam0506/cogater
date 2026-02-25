@@ -3,12 +3,23 @@ from datetime import datetime
 import pytz
 from .models import Company, Product, sign_com
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password  
+from django.contrib.auth.hashers import check_password
 
 
 # Create your views here.
 
-def WebSupport(request):
-    return render(request,"home.html")
+def WebSupport(request, username_com):
+
+    products = Product.objects.select_related(
+        "company", "company__company_id"
+    ).filter(
+        company__company_id__username_com=username_com
+    )
+
+    return render(request, "home.html", {
+        "products": products
+    })
 
 def info_comp(request, username_com):
 
@@ -76,9 +87,28 @@ def info_prod(request, name):
     })
     
 def login_com(request):
-    
-    return render(request,"login_com.html")
 
+    if request.method == "POST":
+
+        username_com = request.POST.get("username_com")
+        password_com = request.POST.get("password_com")
+
+        user = sign_com.objects.filter(username_com=username_com).first()
+
+        if user and check_password(password_com, user.password_com):
+
+            return redirect("home", username_com=username_com)
+
+        else:
+
+            messages.error(
+                request,
+                "Invalid username or password"
+            )
+
+            return redirect("login_com")
+
+    return render(request, "login_com.html")
 def signup_com(request):
     
     if request.method == "POST":
@@ -93,12 +123,13 @@ def signup_com(request):
 
         # # เข้ารหัสรหัสผ่านก่อนบันทึก
         # hashed_password = make_password(password)
+        hashed_password = make_password(password_com)
 
         # บันทึกข้อมูล
         user = sign_com.objects.create(
             username_com=username_com,
             email_com=email_com,
-            password_com=password_com,
+            password_com=hashed_password,
             image_com=image_com
             )
 
