@@ -29,7 +29,7 @@
 
     <h2>Product List</h2>
 
-<table border="1">
+{% comment %} <table border="1">
 
     <tr>
         <th>ID</th>
@@ -37,25 +37,32 @@
         <th>Price</th>
         <th>Quantity</th>
         <th>Description</th>
+    </tr> {% endcomment %}
+
+ {% for report in reports %}
+  <h3>Products in Report {{ report.id }}</h3>
+
+  <table border="1" cellpadding="8">
+    <tr>
+      <th>Product Detail</th>
+      <th>Size</th>
+      <th>Price</th>
     </tr>
 
-    {% comment %} {% for product in products %}
-
-    <tr>
-
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.description }}</td>
-
-    </tr>
-
-    {% endfor %} {% endcomment %}
+    {% for product in report.product_set.all %}
+      {% for size in product.productsize_set.all %}
+      <tr>
+        <td>{{ product.detail }}</td>
+        <td>{{ size.size }}</td>
+        <td>{{ size.price }}</td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+  </table>
+{% endfor %}
 
 
-
-    <tr>
+    {% comment %} <tr>
 
         <td>{{ company }}</td>
         <td>{{ product.name }}</td>
@@ -63,7 +70,7 @@
         <td>{{ product.quantity }}</td>
         <td>{{ product.description }}</td>
 
-    </tr>
+    </tr> {% endcomment %}
 
    
 </table>

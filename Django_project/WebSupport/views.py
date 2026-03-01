@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect
-from datetime import datetime
+
 import pytz
-from .models import Company, Product, sign_com
+from .models import *
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password  
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import render, get_object_or_404
+from datetime import datetime
+from django.db import transaction
+from django.contrib import messages
+
 
 
 # Create your views here.
@@ -17,10 +21,17 @@ def WebSupport(request, username_com):
         company_id__username_com=username_com
     )
 
-    products = company.product_set.all()
+    # Get first report of this company
+    report = Report.objects.filter(company=company).first()
+
+    # Get all products of this company (through report)
+    products = Product.objects.filter(
+        report__company=company
+    ).select_related("report").prefetch_related("sizes")
 
     return render(request, "home.html", {
         "company": company,
+        "report": report,
         "products": products
     })
 
@@ -28,16 +39,14 @@ def info_comp(request, username_com):
 
     users = get_object_or_404(sign_com, username_com=username_com)
 
-    # 🔎 CHECK IF THIS ACCOUNT ALREADY HAS COMPANY
+    # 🔎 เช็คว่า account นี้มี company แล้วไหม
     existing_company = Company.objects.filter(company_id=users).first()
 
     if existing_company:
-        messages.warning(request, "บัญชีนี้มีข้อมูลบริษัทแล้ว")
-        return redirect("info_prod", name=existing_company.name)
+        # ✅ ถ้ามี → ไป info_prod เลย
+        return redirect("info_prod", company_id=existing_company.id)
 
-    thailand_tz = pytz.timezone("Asia/Bangkok")
-    current_time = datetime.now(thailand_tz).strftime("%H:%M:%S")
-
+    # ❌ ยังไม่มี → แสดงฟอร์มสร้าง
     if request.method == "POST":
 
         name = request.POST.get("name")
@@ -49,12 +58,7 @@ def info_comp(request, username_com):
         website = request.POST.get("website")
         logo = request.FILES.get("picture_multi")
 
-        # Optional: prevent duplicate company name
-        if Company.objects.filter(name=name).exists():
-            messages.error(request, "มีชื่อบริษัทนี้อยู่แล้ว")
-            return redirect("info_comp", username_com=username_com)
-
-        Company.objects.create(
+        company = Company.objects.create(
             company_id=users,
             name=name,
             store=store,
@@ -66,35 +70,134 @@ def info_comp(request, username_com):
             logo=logo
         )
 
-        messages.success(request, "สมัครสมาชิกเรียบร้อยแล้ว")
-
-        return redirect("info_prod", name=name)
+        return redirect("info_prod", company_id=company.id)
 
     return render(request, "info_comp.html", {
-        "current_time": current_time,
         "users": users
     })
-def info_prod(request, name):
-    company = Company.objects.filter(name=name).first()
-    
-    
-    
-    
-    thailand_tz = pytz.timezone("Asia/Bangkok")
-    current = datetime.now(thailand_tz).strftime("%H:%M:%S")
 
-    if not company:
-        messages.error(request, "ไม่พบบริษัทนี้")
-        return redirect("info_comp")
 
-    products = Product.objects.filter(company=company)
+# ===============================
+# SHOW PRODUCTS OF A REPORT
+# ===============================
+
+def info_prod(request, company_id):
+
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == "POST":
+
+        # ===============================
+        # 1️⃣ VALIDATE DATE
+        # ===============================
+        start_date_raw = request.POST.get("start_date")
+        end_date_raw = request.POST.get("end_date")
+
+        if not start_date_raw or not end_date_raw:
+            messages.error(request, "Start date and End date are required.")
+            return redirect("info_prod", company_id=company.id)
+
+        try:
+            start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date_raw, "%Y-%m-%d").date()
+        except ValueError:
+            messages.error(request, "Invalid date format. Use YYYY-MM-DD.")
+            return redirect("info_prod", company_id=company.id)
+
+        if end_date < start_date:
+            messages.error(request, "End date cannot be before Start date.")
+            return redirect("info_prod", company_id=company.id)
+
+        # ===============================
+        # 2️⃣ VALIDATE COLLAB TYPE
+        # ===============================
+        collab_type = request.POST.get("collab_type")
+        other_collab = request.POST.get("collab_type_other")
+
+        if not collab_type:
+            messages.error(request, "Collab type is required.")
+            return redirect("info_prod", company_id=company.id)
+
+        if collab_type != "Other":
+            other_collab = None
+
+        ads_image = request.FILES.get("ads_image")
+
+        # ===============================
+        # 3️⃣ SAVE DATA (ATOMIC)
+        # ===============================
+        try:
+            with transaction.atomic():
+
+                # ---------------------------
+                # CREATE REPORT
+                # ---------------------------
+                report = Report.objects.create(
+                    company=company,
+                    collab_type=collab_type,
+                    other_collab=other_collab,
+                    start_date=start_date,
+                    end_date=end_date,
+                    ads_image=ads_image
+                )
+
+                # ---------------------------
+                # SAVE DOCUMENTS
+                # ---------------------------
+                documents = request.FILES.getlist("documents")
+                for doc in documents:
+                    CollabDocument.objects.create(
+                        report=report,
+                        file=doc
+                    )
+
+                # ---------------------------
+                # SAVE PRODUCTS
+                # ---------------------------
+                product_count = int(request.POST.get("product_count", 0))
+
+                for i in range(product_count):
+
+                    image = request.FILES.get(f"product_image_{i}")
+                    detail = request.POST.get(f"product_detail_{i}")
+
+                    # ถ้า product ว่างจริง ๆ ข้าม
+                    if not image and not detail:
+                        continue
+
+                    product = Product.objects.create(
+                        report=report,
+                        image=image,
+                        detail=detail
+                    )
+
+                    # ---------------------------
+                    # SAVE PRODUCT SIZES
+                    # ---------------------------
+                    size_count = int(request.POST.get(f"size_count_{i}", 0))
+
+                    for j in range(size_count):
+
+                        size = request.POST.get(f"product_{i}_size_{j}")
+                        price = request.POST.get(f"product_{i}_price_{j}")
+
+                        if size and price:
+                            ProductSize.objects.create(
+                                product=product,
+                                size=size,
+                                price=price
+                            )
+
+        except Exception as e:
+            messages.error(request, f"Error saving data: {str(e)}")
+            return redirect("info_prod", company_id=company.id)
+
+        messages.success(request, "Report created successfully.")
+        return redirect("info_prod", company_id=company.id)
 
     return render(request, "info_prod.html", {
-        "current": current,
-        "company": company,
-        "products": products
+        "company": company
     })
-    
 def login_com(request):
 
     if request.method == "POST":

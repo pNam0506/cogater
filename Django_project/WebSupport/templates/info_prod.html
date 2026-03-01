@@ -101,240 +101,276 @@
   }
 </style>
 
-<div id="app" class="container">
-  <!-- PROMOTE SECTION -->
-  <div class="section-box">
-    <div class="section-title">Promote Information</div>
+<form method="post" enctype="multipart/form-data">
 
-    <div class="form-grid">
-      <!-- ADS IMAGE -->
-      <div>
-        <label>Ads Image</label>
+  {% csrf_token %}
 
-        <div style="position: relative; width: 200px">
-          <img
-            :src="adsPreview || 'add-symbol-svgrepo-com.png'"
-            @click="selectAdsImage"
-            style="
-              width: 200px;
-              height: 200px;
-              cursor: pointer;
-              object-fit: cover;
-              border: 2px dashed #bbb;
-            "
-          />
+  <div id="app" class="container">
+    <!-- PROMOTE SECTION -->
+    <div class="section-box">
+      <div class="section-title">Promote Information</div>
 
-          <button
-            v-if="adsPreview"
-            @click="removeAdsImage"
-            type="button"
-            class="delete-btn"
-          >
-            ✕
-          </button>
+      <div class="form-grid">
+        <!-- ADS IMAGE -->
+        <div>
+          <label>Ads Image</label>
+
+          <div style="position: relative; width: 200px">
+            <img
+              :src="adsPreview || 'add-symbol-svgrepo-com.png'"
+              @click="selectAdsImage"
+              style="
+                width: 200px;
+                height: 200px;
+                cursor: pointer;
+                object-fit: cover;
+                border: 2px dashed #bbb;
+              "
+            />
+
+            <button
+              v-if="adsPreview"
+              @click="removeAdsImage"
+              type="button"
+              class="delete-btn"
+            >
+              ✕
+            </button>
+
+            <input
+              name="ads_image"
+              type="file"
+              ref="adsInput"
+              hidden
+              accept="image/*"
+              @change="onAdsChange"
+            />
+          </div>
+        </div>
+
+        <!-- COLLAB TYPE -->
+        <div>
+          <label>Collab Type</label>
+          <select v-model="collabType" name="collab_type">
+            <option value="">Select</option>
+            <option value="cartoon" name="cartoon">Cartoon</option>
+            <option value="anime" name="anime">Anime</option>
+            <option value="movie" name="movie">Movie</option>
+            <option value="game" name="game">Game</option> 
+            <option>Other</option>
+          </select>
 
           <input
-            type="file"
-            ref="adsInput"
-            hidden
-            accept="image/*"
-            @change="onAdsChange"
+            name="collab_type_other"
+            v-if="collabType === 'Other'"
+            type="text"
+            placeholder="Specify"
+            style="margin-top: 10px"
+          />
+        </div>
+
+        <!-- START DATE -->
+        <div>
+          <label>Start Date</label>
+          <input
+            name = "start_date"
+            type="date"
+            v-model="startDate"
+            :min="today"
+            @change="validateDates"
+          />
+        </div>
+
+        <!-- END DATE -->
+        <div>
+          <label>End Date</label>
+          <input
+            name = "end_date"
+            type="date"
+            v-model="endDate"
+            :min="startDate || today"
+            @change="validateDates"
           />
         </div>
       </div>
 
-      <!-- COLLAB TYPE -->
-      <div>
-        <label>Collab Type</label>
-        <select v-model="collabType">
-          <option value="">Select</option>
-          <option>การ์ตูน</option>
-          <option>อนิเมะ</option>
-          <option>หนัง</option>
-          <option>เกม</option>
-          <option>Other</option>
-        </select>
-
-        <input
-          v-if="collabType === 'Other'"
-          type="text"
-          placeholder="Specify"
-          style="margin-top: 10px"
-        />
-      </div>
-
-      <!-- START DATE -->
-      <div>
-        <label>Start Date</label>
-        <input
-          type="date"
-          v-model="startDate"
-          :min="today"
-          @change="validateDates"
-        />
-      </div>
-
-      <!-- END DATE -->
-      <div>
-        <label>End Date</label>
-        <input
-          type="date"
-          v-model="endDate"
-          :min="startDate || today"
-          @change="validateDates"
-        />
-      </div>
+      <p v-if="dateError" style="color: red; margin-top: 10px">
+        {{ dateError }}
+      </p>
     </div>
 
-    <p v-if="dateError" style="color: red; margin-top: 10px">{{ dateError }}</p>
-  </div>
+    <!-- COLLAB DOCUMENTS -->
+    <!-- COLLAB DOCUMENTS -->
+    <div class="section-box">
+      <div class="section-title">Collab Documents</div>
 
-  <!-- COLLAB DOCUMENTS -->
-  <!-- COLLAB DOCUMENTS -->
-  <div class="section-box">
-    <div class="section-title">Collab Documents</div>
-
-    <div class="horizontal-images">
-      <div
-        v-for="(doc, index) in documents"
-        :key="index"
-        style="
-          position: relative;
-          width: 200px;
-          height: 200px;
-          border: 2px dashed #bbb;
-          border-radius: 10px;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        "
-      >
-        <!-- IMAGE PREVIEW -->
-        <img
-          v-if="doc.type.startsWith('image/')"
-          :src="doc.preview"
-          style="width: 100%; height: 100%; object-fit: cover"
-        />
-
-        <!-- PDF PREVIEW -->
-        <iframe
-          v-else-if="doc.type === 'application/pdf'"
-          :src="doc.preview"
-          style="width: 100%; height: 100%; border: none"
+      <div class="horizontal-images">
+        <div
+          v-for="(doc, index) in documents"
+          :key="index"
+          style="
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #bbb;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
         >
-        </iframe>
-
-        <!-- OTHER FILES -->
-        <div v-else style="text-align: center; padding: 10px">
-          📄
-          <p style="font-size: 12px">{{ doc.name }}</p>
-        </div>
-
-        <button class="delete-btn" @click="removeDocument(index)" type="button">
-          ✕
-        </button>
-      </div>
-
-      <div class="add-box" @click="selectDocument">+</div>
-    </div>
-
-    <input
-      type="file"
-      ref="documentInput"
-      hidden
-      multiple
-      accept=".pdf,.doc,.docx,image/*"
-      @change="onDocumentChange"
-    />
-  </div>
-
-  <!-- PRODUCT ITEMS -->
-  {% verbatim %}
-  <div v-for="(product, pIndex) in products" :key="pIndex" class="section-box">
-    <div class="section-title">Item {{ pIndex + 1 }}</div>
-
-    <div class="form-grid">
-      <div>
-        <label>Product Image</label>
-
-        <div style="position: relative; width: 200px">
+          <!-- IMAGE PREVIEW -->
           <img
-            :src="product.preview || 'add-symbol-svgrepo-com.png'"
-            @click="selectImage(pIndex)"
-            style="
-              width: 200px;
-              height: 200px;
-              cursor: pointer;
-              object-fit: cover;
-              border: 2px dashed #bbb;
-            "
+            v-if="doc.type.startsWith('image/')"
+            :src="doc.preview"
+            style="width: 100%; height: 100%; object-fit: cover"
           />
 
+          <!-- PDF PREVIEW -->
+          <iframe
+            v-else-if="doc.type === 'application/pdf'"
+            :src="doc.preview"
+            style="width: 100%; height: 100%; border: none"
+          >
+          </iframe>
+
+          <!-- OTHER FILES -->
+          <div v-else style="text-align: center; padding: 10px">
+            📄
+            <p style="font-size: 12px">{{ doc.name }}</p>
+          </div>
+
           <button
-            v-if="product.preview"
-            @click="removeImage(pIndex)"
-            type="button"
             class="delete-btn"
+            @click="removeDocument(index)"
+            type="button"
           >
             ✕
           </button>
+        </div>
 
-          <input
-            type="file"
-            :ref="'fileInput' + pIndex"
-            hidden
-            accept="image/*"
-            @change="onImageChange($event, pIndex)"
-          />
+        <div class="add-box" @click="selectDocument">+</div>
+      </div>
+
+      <input
+        type="file"
+        ref="documentInput"
+        name="documents"
+        hidden
+        multiple
+        accept=".pdf,.doc,.docx,image/*"
+        @change="onDocumentChange"
+      />
+    </div>
+
+    <!-- PRODUCT ITEMS -->
+    {% verbatim %}
+    <div
+      v-for="(product, pIndex) in products"
+      :key="pIndex"
+      class="section-box"
+    >
+      <div class="section-title">Item {{ pIndex + 1 }}</div>
+
+      <div class="form-grid">
+        <div>
+          <label>Product Image</label>
+
+          <div style="position: relative; width: 200px">
+            <img
+              :src="product.preview || 'add-symbol-svgrepo-com.png'"
+              @click="selectImage(pIndex)"
+              style="
+                width: 200px;
+                height: 200px;
+                cursor: pointer;
+                object-fit: cover;
+                border: 2px dashed #bbb;
+              "
+            />
+
+            <button
+              v-if="product.preview"
+              @click="removeImage(pIndex)"
+              type="button"
+              class="delete-btn"
+            >
+              ✕
+            </button>
+
+            <input
+              type="file"
+              :name="'product_image_' + pIndex"
+              :ref="'fileInput' + pIndex"
+              hidden
+              accept="image/*"
+              @change="onImageChange($event, pIndex)"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label>Detail</label>
+          <textarea v-model="product.detail"
+          :name="'product_detail_' + pIndex"
+          ></textarea>
         </div>
       </div>
 
-      <div>
-        <label>Detail</label>
-        <textarea v-model="product.detail"></textarea>
-      </div>
-    </div>
+      <div
+        v-for="(sizeItem, sIndex) in product.sizes"
+        :key="sIndex"
+        class="form-grid"
+        style="margin-top: 20px"
+      >
+        <div>
+          <label>Size</label>
+          <input v-model="sizeItem.size" 
+          :name="'product_' + pIndex + '_size_' + sIndex"
+          />
+        </div>
 
-    <div
-      v-for="(sizeItem, sIndex) in product.sizes"
-      :key="sIndex"
-      class="form-grid"
-      style="margin-top: 20px"
-    >
-      <div>
-        <label>Size</label>
-        <input v-model="sizeItem.size" />
+        <div>
+          <label>Price</label>
+          <input type="number" 
+          v-model.number="sizeItem.price"
+          :name="'product_' + pIndex + '_price_' + sIndex"
+          />
+        </div>
+
+        <div style="text-align: right">
+          <button class="btn btn-delete" @click="removeSize(pIndex, sIndex)">
+            Delete Size
+          </button>
+        </div>
       </div>
 
-      <div>
-        <label>Price</label>
-        <input type="number" v-model.number="sizeItem.price" />
-      </div>
+      <button type="button" class="btn" style="margin-top: 15px" @click="addSize(pIndex)">
+        + Add Size
+      </button>
 
-      <div style="text-align: right">
-        <button class="btn btn-delete" @click="removeSize(pIndex, sIndex)">
-          Delete Size
+       <input type="hidden"
+         :name="'size_count_' + pIndex"
+         :value="product.sizes.length">
+
+      <div style="text-align: right; margin-top: 15px">
+        <button type="button" class="btn btn-delete" @click="removeProduct(pIndex)">
+          Delete Item
         </button>
       </div>
     </div>
 
-    <button class="btn" style="margin-top: 15px" @click="addSize(pIndex)">
-      + Add Size
+    <button type="button" class="btn btn-add" style="margin-top: 20px" @click="addProduct">
+      + Add Item
     </button>
-
-    <div style="text-align: right; margin-top: 15px">
-      <button class="btn btn-delete" @click="removeProduct(pIndex)">
-        Delete Item
-      </button>
-    </div>
+    {% endverbatim %}
+    <input type="hidden" name="product_count" :value="products.length">
   </div>
-
-  <button class="btn btn-add" style="margin-top: 20px" @click="addProduct">
-    + Add Item
-  </button>
-  {% endverbatim %}
-</div>
+  <button type="submit">
+  Submit
+</button>
+</form>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
