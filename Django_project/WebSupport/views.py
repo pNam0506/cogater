@@ -5,25 +5,35 @@ from .models import Company, Product, sign_com
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password  
 from django.contrib.auth.hashers import check_password
+from django.shortcuts import render, get_object_or_404
 
 
 # Create your views here.
 
 def WebSupport(request, username_com):
 
-    products = Product.objects.select_related(
-        "company", "company__company_id"
-    ).filter(
-        company__company_id__username_com=username_com
+    company = get_object_or_404(
+        Company.objects.select_related("company_id"),
+        company_id__username_com=username_com
     )
 
+    products = company.product_set.all()
+
     return render(request, "home.html", {
+        "company": company,
         "products": products
     })
 
 def info_comp(request, username_com):
 
-    users = sign_com.objects.get(username_com=username_com)
+    users = get_object_or_404(sign_com, username_com=username_com)
+
+    # 🔎 CHECK IF THIS ACCOUNT ALREADY HAS COMPANY
+    existing_company = Company.objects.filter(company_id=users).first()
+
+    if existing_company:
+        messages.warning(request, "บัญชีนี้มีข้อมูลบริษัทแล้ว")
+        return redirect("info_prod", name=existing_company.name)
 
     thailand_tz = pytz.timezone("Asia/Bangkok")
     current_time = datetime.now(thailand_tz).strftime("%H:%M:%S")
@@ -39,17 +49,13 @@ def info_comp(request, username_com):
         website = request.POST.get("website")
         logo = request.FILES.get("picture_multi")
 
+        # Optional: prevent duplicate company name
         if Company.objects.filter(name=name).exists():
-
-            messages.error(request, "มีชื่อผู้ใช้นี้อยู่แล้ว")
-
+            messages.error(request, "มีชื่อบริษัทนี้อยู่แล้ว")
             return redirect("info_comp", username_com=username_com)
 
-
         Company.objects.create(
-
-            company_id=users,   # ⭐⭐⭐ เพิ่มบรรทัดนี้
-
+            company_id=users,
             name=name,
             store=store,
             address=address,
@@ -58,22 +64,24 @@ def info_comp(request, username_com):
             operator=operator,
             website=website,
             logo=logo
-
         )
 
         messages.success(request, "สมัครสมาชิกเรียบร้อยแล้ว")
 
         return redirect("info_prod", name=name)
 
-
     return render(request, "info_comp.html", {
-
         "current_time": current_time,
         "users": users
-
     })
 def info_prod(request, name):
     company = Company.objects.filter(name=name).first()
+    
+    
+    
+    
+    thailand_tz = pytz.timezone("Asia/Bangkok")
+    current = datetime.now(thailand_tz).strftime("%H:%M:%S")
 
     if not company:
         messages.error(request, "ไม่พบบริษัทนี้")
@@ -82,6 +90,7 @@ def info_prod(request, name):
     products = Product.objects.filter(company=company)
 
     return render(request, "info_prod.html", {
+        "current": current,
         "company": company,
         "products": products
     })

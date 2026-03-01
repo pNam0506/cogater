@@ -19,7 +19,11 @@
 
     
     <div class="menu">
-        <a href="info_comp"><button>Report</button></a>
+       <a href="{% url 'info_comp' company.company_id.username_com %}">
+            <button>Report</button>
+        </a>
+        
+        {{company}}
 
     </div>
 
@@ -35,7 +39,7 @@
         <th>Description</th>
     </tr>
 
-    {% for product in products %}
+    {% comment %} {% for product in products %}
 
     <tr>
 
@@ -47,8 +51,21 @@
 
     </tr>
 
-    {% endfor %}
+    {% endfor %} {% endcomment %}
 
+
+
+    <tr>
+
+        <td>{{ company }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.description }}</td>
+
+    </tr>
+
+   
 </table>
     
 

@@ -21,7 +21,8 @@ class Company(models.Model):
     operator = models.CharField(max_length=100)
     website = models.URLField()
     logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
-    
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
     def __str__(self):
         return self.name
     
@@ -35,6 +36,8 @@ class Product(models.Model):
     color = models.CharField(max_length=30)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)  # ← ฟิลด์เก็บรูป
     created_at = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
