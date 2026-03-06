@@ -10,6 +10,7 @@ from datetime import datetime
 from django.db import transaction
 from django.contrib import messages
 from django.http import JsonResponse
+from admin_cogater.models import Notification
 
 
 
@@ -143,6 +144,7 @@ def info_prod(request, company_id):
 
         ads_image = request.FILES.get("ads_image")
         name = request.POST.get("collection_name")
+        desc = request.POST.get("collection_desc")
 
         # ===============================
         # 3️⃣ SAVE DATA (ATOMIC)
@@ -155,18 +157,29 @@ def info_prod(request, company_id):
                 # ---------------------------
                 report = Report.objects.create(
                     company=company,
-                    name = name,
+                    name=name,
+                    description = desc,
                     collab_type=collab_type,
                     other_collab=other_collab,
                     start_date=start_date,
                     end_date=end_date,
-                    ads_image=ads_image
+                    ads_image=ads_image,
+                    status="sent"
+                )
+
+                # ---------------------------
+                # 🔔 CREATE NOTIFICATION
+                # ---------------------------
+                Notification.objects.create(
+                    report=report,
+                    message=f"New report from {company.name}"
                 )
 
                 # ---------------------------
                 # SAVE DOCUMENTS
                 # ---------------------------
                 documents = request.FILES.getlist("documents")
+
                 for doc in documents:
                     CollabDocument.objects.create(
                         report=report,
@@ -329,3 +342,26 @@ def get_documents(request, report_id):
         })
 
     return JsonResponse(data, safe=False)
+
+def edit_report(request, report_id):
+
+    report = get_object_or_404(Report, id=report_id)
+
+    if report.status != "sent":
+        messages.error(request, "This report can no longer be edited.")
+        return redirect("home", report.company.company_id.username_com)
+
+    if request.method == "POST":
+
+        report.name = request.POST.get("name")
+        report.start_date = request.POST.get("start_date")
+        report.end_date = request.POST.get("end_date")
+
+        report.save()
+
+        messages.success(request, "Report updated.")
+        return redirect("home", report.company.company_id.username_com)
+
+    return render(request, "edit_report.html", {
+        "report": report
+    })

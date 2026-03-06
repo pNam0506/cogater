@@ -88,6 +88,7 @@ No document
 <th>End Date</th>
 <th>Documents</th>
 <th>Status</th>
+<th>Action</th>
 </tr>
 </thead>
 
@@ -96,6 +97,7 @@ No document
 {% for report in reports %}
 
 <tr>
+
 <td>{{ report.id }}</td>
 
 <td>{{ report.name }}</td>
@@ -114,10 +116,42 @@ No document
 <br>
 
 {% empty %}
-
 No document
-
 {% endfor %}
+
+</td>
+
+<td>
+
+{% if report.status == "sent" %}
+🟡 Sent
+
+{% elif report.status == "read" %}
+🔵 Read
+
+{% elif report.status == "approved" %}
+🟢 Approved
+
+{% elif report.status == "rejected" %}
+🔴 Rejected
+
+{% endif %}
+
+</td>
+
+<td>
+
+{% if report.status == "sent" %}
+
+<a href="{% url 'edit_report' report.id %}">
+<button>✏️ Edit</button>
+</a>
+
+{% else %}
+
+<button disabled>🔒 Locked</button>
+
+{% endif %}
 
 </td>
 

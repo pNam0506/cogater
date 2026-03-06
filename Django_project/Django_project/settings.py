@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'base',
     'myapp',
     'WebSupport',
+    'admin_cogater',
 ]
 
 MIDDLEWARE = [

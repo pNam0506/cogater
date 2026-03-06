@@ -1,0 +1,29 @@
+{% extends "base_web.html" %}
+
+{% block content %}
+
+<h2>Edit Report {{ report.id }}</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<label>Collection Name</label>
+<input type="text" name="name" value="{{ report.name }}">
+
+<br><br>
+
+<label>Start Date</label>
+<input type="date" name="start_date" value="{{ report.start_date|date:'Y-m-d' }}">
+
+<br><br>
+
+<label>End Date</label>
+<input type="date" name="end_date" value="{{ report.end_date|date:'Y-m-d' }}">
+
+<br><br>
+
+<button type="submit">Save</button>
+
+</form>
+
+{% endblock %}

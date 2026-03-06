@@ -24,6 +24,7 @@ urlpatterns = [
     # path('',include("base.urls")),
     path('myapp/', include("myapp.urls")),
     path('WebSupport/',include("WebSupport.urls")),
+     path('admin_cogater/', include('admin_cogater.urls')),
     
 ]
 

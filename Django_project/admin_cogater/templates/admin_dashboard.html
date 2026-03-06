@@ -1,0 +1,19 @@
+<h2>Notifications</h2>
+
+{% for n in notifications %}
+
+<div style="padding:10px;border:1px solid #ddd;margin-bottom:10px">
+
+<a href="{% url 'report_detail' n.report.id %}">
+
+{{ n.message }}
+
+</a>
+
+</div>
+
+{% empty %}
+
+<p>No notifications</p>
+
+{% endfor %}

@@ -44,11 +44,13 @@ class Company(models.Model):
 
 
 class Report(models.Model):
-    
+
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    
+
     name = models.CharField(max_length=255)
     
+    description = models.CharField(max_length=255)
+
     COLLAB_CHOICES = [
         ('Cartoon', 'Cartoon'),
         ('Anime', 'Anime'),
@@ -57,6 +59,8 @@ class Report(models.Model):
         ('Other', 'Other'),
     ]
 
+    
+
     collab_type = models.CharField(max_length=50, choices=COLLAB_CHOICES)
     other_collab = models.CharField(max_length=100, blank=True, null=True)
 
@@ -64,6 +68,18 @@ class Report(models.Model):
     end_date = models.DateField()
 
     ads_image = models.ImageField(upload_to='ads_images/', blank=True, null=True)
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("sent", "Sent"),
+        ("read", "Read"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ],
+    default="sent"
+)
+
+ 
 
     created_at = models.DateTimeField(auto_now_add=True)
 

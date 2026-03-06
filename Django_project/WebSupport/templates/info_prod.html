@@ -109,6 +109,11 @@
     <div class="section-box">
       <div class="section-title">Promote Information</div>
 
+      <div>
+        <label>Collection Name</label>
+        <input v-model="collectionName" name="collection_name" />
+      </div>
+
       <div class="form-grid">
         <!-- ADS IMAGE -->
         <div>
@@ -243,9 +248,10 @@
         <!-- ADD BUTTON -->
         <div v-else class="add-box" @click="selectDocument">+</div>
       </div>
+      
       <div>
-        <label>Collection Name</label>
-        <input v-model="collectionName" name="collection_name" />
+        <label>Description</label>
+        <input v-model="collectionDesc" name="collection_desc" />
       </div>
    
 
@@ -404,6 +410,7 @@
       document: null,
 
       collectionName: "", // ✅ เพิ่มอันนี้
+      collectionDesc: "",
 
       products: [
         {

@@ -18,7 +18,8 @@ path(
     'get_documents/<int:report_id>/',
     views.get_documents,
     name='get_documents'
-)
+),
+path('report/edit/<int:report_id>/', views.edit_report, name='edit_report'),
 
     
 ]

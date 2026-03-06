@@ -1,0 +1,122 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+<title>Report Detail</title>
+{% endblock %}
+
+{% block content %}
+
+<div style="width:90%;margin:auto;margin-top:30px">
+
+<h1>Report Detail</h1>
+
+<hr>
+
+<h2>Company</h2>
+<p>{{ report.company.name }}</p>
+
+<h2>Collection Name</h2>
+<p>{{ report.name }}</p>
+
+<h2>Collab Type</h2>
+<p>
+{{ report.collab_type }}
+{% if report.collab_type == "Other" %}
+ - {{ report.other_collab }}
+{% endif %}
+</p>
+
+<h2>Campaign Period</h2>
+<p>
+Start : {{ report.start_date }} <br>
+End : {{ report.end_date }}
+</p>
+
+<hr>
+
+<h2>Ads Image</h2>
+
+{% if report.ads_image %}
+<img src="{{ report.ads_image.url }}" width="300">
+{% else %}
+<p>No image</p>
+{% endif %}
+
+<hr>
+
+<h2>Documents</h2>
+
+{% for doc in report.documents.all %}
+
+<div>
+<a href="{{ doc.file.url }}" target="_blank">
+📄 Document {{ forloop.counter }}
+</a>
+</div>
+
+{% empty %}
+
+<p>No documents</p>
+
+{% endfor %}
+
+<hr>
+
+<h2>Products</h2>
+
+{% for product in products %}
+
+<div style="border:1px solid #ccc;padding:10px;margin-bottom:10px">
+
+    
+
+    {% if product.image %}
+        <img src="{{ product.image.url }}" width="150">
+    {% endif %}
+
+    <p><b>Detail:</b> {{ product.detail }}</p>
+
+    <h4>Sizes</h4>
+
+    <ul>
+    {% for size in product.sizes.all %}
+        <li>
+            {{ size.size }} - {{ size.price }}
+        </li>
+    {% empty %}
+        <li>No sizes</li>
+    {% endfor %}
+    </ul>
+
+</div>
+
+{% empty %}
+<p>No products</p>
+{% endfor %}
+<hr>
+
+<hr>
+
+<div style="margin-top:30px">
+
+<form method="POST" action="{% url 'approve_report' report.id %}">
+{% csrf_token %}
+<button style="background:green;color:white;padding:10px 20px;border:none;border-radius:6px">
+Approve
+</button>
+</form>
+
+<br>
+
+<form method="POST" action="{% url 'reject_report' report.id %}">
+{% csrf_token %}
+<button style="background:red;color:white;padding:10px 20px;border:none;border-radius:6px">
+Reject
+</button>
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}
