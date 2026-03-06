@@ -82,6 +82,9 @@ class Report(models.Model):
  
 
     created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    rejected_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Report {self.id} - {self.collab_type}"

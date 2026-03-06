@@ -1,5 +1,6 @@
 from django.db import models
 from WebSupport.models import Report
+from django.contrib.auth.models import User
 
 class Notification(models.Model):
 
@@ -13,14 +14,26 @@ class Notification(models.Model):
     
 class Report(models.Model):
 
-    STATUS_CHOICES = [
-        ('pending','Pending'),
-        ('approved','Approved'),
-        ('rejected','Rejected'),
-    ]
+    username = models.CharField(max_length=100)
 
     status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
+        choices=[
+            ("sent", "Sent"),
+            ("read", "Read"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"),
+        ],
+        default="sent"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)  # เวลาที่ WebSupport ส่ง
+    read_at = models.DateTimeField(null=True, blank=True) # เวลา Admin เปิดอ่าน
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )

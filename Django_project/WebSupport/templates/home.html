@@ -87,8 +87,10 @@ No document
 <th>Start Date</th>
 <th>End Date</th>
 <th>Documents</th>
+<th>Sent_date</th>
 <th>Status</th>
 <th>Action</th>
+<th>result_date</th>
 </tr>
 </thead>
 
@@ -120,6 +122,9 @@ No document
 {% endfor %}
 
 </td>
+
+<td>{{ report.created_at }}</td>
+
 
 <td>
 
@@ -153,6 +158,14 @@ No document
 
 {% endif %}
 
+</td>
+
+<td>
+{% if report.read_at %}
+{{ report.read_at }}
+{% else %}
+Not read yet
+{% endif %}
 </td>
 
 </tr>

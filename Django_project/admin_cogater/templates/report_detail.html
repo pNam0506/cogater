@@ -99,7 +99,21 @@ End : {{ report.end_date }}
 
 <div style="margin-top:30px">
 
-<form method="POST" action="{% url 'approve_report' report.id %}">
+{% if report.status == "approved" %}
+
+<button disabled style="background:gray;color:white;padding:10px 20px;border:none;border-radius:6px">
+Already Approved
+</button>
+
+{% elif report.status == "rejected" %}
+
+<button disabled style="background:gray;color:white;padding:10px 20px;border:none;border-radius:6px">
+Already Rejected
+</button>
+
+{% else %}
+
+<form method="POST" action="{% url 'approve_report' report.id %}" onsubmit="return confirmApprove()">
 {% csrf_token %}
 <button style="background:green;color:white;padding:10px 20px;border:none;border-radius:6px">
 Approve
@@ -108,15 +122,29 @@ Approve
 
 <br>
 
-<form method="POST" action="{% url 'reject_report' report.id %}">
+<form method="POST" action="{% url 'reject_report' report.id %}" onsubmit="return confirmReject()">
 {% csrf_token %}
 <button style="background:red;color:white;padding:10px 20px;border:none;border-radius:6px">
 Reject
 </button>
 </form>
 
+{% endif %}
+
 </div>
 
 </div>
+
+<script>
+
+function confirmApprove(){
+    return confirm("Are you sure you want to APPROVE this report?");
+}
+
+function confirmReject(){
+    return confirm("Are you sure you want to REJECT this report?");
+}
+
+</script>
 
 {% endblock %}

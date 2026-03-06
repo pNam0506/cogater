@@ -1,0 +1,23 @@
+<h2>Read Reports</h2>
+
+{% for r in reports %}
+
+<div style="padding:10px;border:1px solid #ddd;margin-bottom:10px">
+
+<a href="{% url 'report_detail' r.id %}">
+Report {{ r.id }} - {{ r.name }}
+</a>
+
+<p>Read at: {{ r.read_at }}</p>
+
+</div>
+
+{% empty %}
+
+<p>No read reports</p>
+
+{% endfor %}
+
+<a href="{% url 'admin_home' %}">
+<button>Back</button>
+</a>

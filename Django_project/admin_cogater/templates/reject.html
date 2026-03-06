@@ -1,0 +1,23 @@
+<h2>Rejected Reports</h2>
+
+{% for r in reports %}
+
+<div style="padding:10px;border:1px solid #ddd;margin-bottom:10px">
+
+<a href="{% url 'report_detail' r.id %}">
+Report {{ r.id }} - {{ r.name }}
+</a>
+
+<p>Status: Rejected</p>
+
+</div>
+
+{% empty %}
+
+<p>No rejected reports</p>
+
+{% endfor %}
+
+<a href="{% url 'admin_home' %}">
+<button>Back</button>
+</a>

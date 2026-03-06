@@ -68,27 +68,23 @@
 <div class="container">
 
 <div class="title">
-🔔 Notifications
+🔔 New Notifications
 </div>
 
 
 {% for n in notifications %}
 
-<div class="notification-card">
+<div class="notification-box">
 
-<a href="{% url 'report_detail' n.report.id %}">
-{{ n.message }}
+<a href="{% url 'report_detail' n.id %}">
+{{ n.name }}
 </a>
-
-<div class="time">
-{{ n.created_at }}
-</div>
 
 </div>
 
 {% empty %}
 
-<p class="empty">No notifications</p>
+<p>No notifications</p>
 
 {% endfor %}
 
