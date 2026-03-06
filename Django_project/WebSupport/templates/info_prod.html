@@ -102,7 +102,6 @@
 </style>
 
 <form method="post" enctype="multipart/form-data">
-
   {% csrf_token %}
 
   <div id="app" class="container">
@@ -156,7 +155,7 @@
             <option value="cartoon" name="cartoon">Cartoon</option>
             <option value="anime" name="anime">Anime</option>
             <option value="movie" name="movie">Movie</option>
-            <option value="game" name="game">Game</option> 
+            <option value="game" name="game">Game</option>
             <option>Other</option>
           </select>
 
@@ -173,7 +172,7 @@
         <div>
           <label>Start Date</label>
           <input
-            name = "start_date"
+            name="start_date"
             type="date"
             v-model="startDate"
             :min="today"
@@ -185,7 +184,7 @@
         <div>
           <label>End Date</label>
           <input
-            name = "end_date"
+            name="end_date"
             type="date"
             v-model="endDate"
             :min="startDate || today"
@@ -197,17 +196,13 @@
       <p v-if="dateError" style="color: red; margin-top: 10px">
         {{ dateError }}
       </p>
-    </div>
 
-    <!-- COLLAB DOCUMENTS -->
-    <!-- COLLAB DOCUMENTS -->
-    <div class="section-box">
-      <div class="section-title">Collab Documents</div>
+      <div class="section-title">Collab Document</div>
 
       <div class="horizontal-images">
+        <!-- DOCUMENT PREVIEW -->
         <div
-          v-for="(doc, index) in documents"
-          :key="index"
+          v-if="document"
           style="
             position: relative;
             width: 200px;
@@ -220,49 +215,50 @@
             justify-content: center;
           "
         >
-          <!-- IMAGE PREVIEW -->
+          <!-- IMAGE -->
           <img
-            v-if="doc.type.startsWith('image/')"
-            :src="doc.preview"
+            v-if="document.type.startsWith('image/')"
+            :src="document.preview"
             style="width: 100%; height: 100%; object-fit: cover"
           />
 
-          <!-- PDF PREVIEW -->
+          <!-- PDF -->
           <iframe
-            v-else-if="doc.type === 'application/pdf'"
-            :src="doc.preview"
+            v-else-if="document.type === 'application/pdf'"
+            :src="document.preview"
             style="width: 100%; height: 100%; border: none"
-          >
-          </iframe>
+          ></iframe>
 
-          <!-- OTHER FILES -->
-          <div v-else style="text-align: center; padding: 10px">
+          <!-- OTHER -->
+          <div v-else style="text-align: center">
             📄
-            <p style="font-size: 12px">{{ doc.name }}</p>
+            <p style="font-size: 12px">{{ document.name }}</p>
           </div>
 
-          <button
-            class="delete-btn"
-            @click="removeDocument(index)"
-            type="button"
-          >
+          <button class="delete-btn" @click="removeDocument" type="button">
             ✕
           </button>
         </div>
 
-        <div class="add-box" @click="selectDocument">+</div>
+        <!-- ADD BUTTON -->
+        <div v-else class="add-box" @click="selectDocument">+</div>
       </div>
+      <div>
+        <label>Collection Name</label>
+        <input v-model="collectionName" name="collection_name" />
+      </div>
+   
 
-      <input
-        type="file"
-        ref="documentInput"
-        name="documents"
-        hidden
-        multiple
-        accept=".pdf,.doc,.docx,image/*"
-        @change="onDocumentChange"
-      />
     </div>
+
+    <input
+      type="file"
+      ref="documentInput"
+      name="documents"
+      hidden
+      accept=".pdf,.doc,.docx,image/*"
+      @change="onDocumentChange"
+    />
 
     <!-- PRODUCT ITEMS -->
     {% verbatim %}
@@ -312,8 +308,9 @@
 
         <div>
           <label>Detail</label>
-          <textarea v-model="product.detail"
-          :name="'product_detail_' + pIndex"
+          <textarea
+            v-model="product.detail"
+            :name="'product_detail_' + pIndex"
           ></textarea>
         </div>
       </div>
@@ -326,16 +323,18 @@
       >
         <div>
           <label>Size</label>
-          <input v-model="sizeItem.size" 
-          :name="'product_' + pIndex + '_size_' + sIndex"
+          <input
+            v-model="sizeItem.size"
+            :name="'product_' + pIndex + '_size_' + sIndex"
           />
         </div>
 
         <div>
           <label>Price</label>
-          <input type="number" 
-          v-model.number="sizeItem.price"
-          :name="'product_' + pIndex + '_price_' + sIndex"
+          <input
+            type="number"
+            v-model.number="sizeItem.price"
+            :name="'product_' + pIndex + '_price_' + sIndex"
           />
         </div>
 
@@ -346,30 +345,44 @@
         </div>
       </div>
 
-      <button type="button" class="btn" style="margin-top: 15px" @click="addSize(pIndex)">
+      <button
+        type="button"
+        class="btn"
+        style="margin-top: 15px"
+        @click="addSize(pIndex)"
+      >
         + Add Size
       </button>
 
-       <input type="hidden"
-         :name="'size_count_' + pIndex"
-         :value="product.sizes.length">
+      <input
+        type="hidden"
+        :name="'size_count_' + pIndex"
+        :value="product.sizes.length"
+      />
 
       <div style="text-align: right; margin-top: 15px">
-        <button type="button" class="btn btn-delete" @click="removeProduct(pIndex)">
+        <button
+          type="button"
+          class="btn btn-delete"
+          @click="removeProduct(pIndex)"
+        >
           Delete Item
         </button>
       </div>
     </div>
 
-    <button type="button" class="btn btn-add" style="margin-top: 20px" @click="addProduct">
+    <button
+      type="button"
+      class="btn btn-add"
+      style="margin-top: 20px"
+      @click="addProduct"
+    >
       + Add Item
     </button>
     {% endverbatim %}
-    <input type="hidden" name="product_count" :value="products.length">
+    <input type="hidden" name="product_count" :value="products.length" />
   </div>
-  <button type="submit">
-  Submit
-</button>
+  <button type="submit">Submit</button>
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
@@ -388,7 +401,9 @@
       adsFile: null,
       adsPreview: "",
 
-      documents: [],
+      document: null,
+
+      collectionName: "", // ✅ เพิ่มอันนี้
 
       products: [
         {
@@ -476,31 +491,29 @@
         this.products[index].image = null;
         this.products[index].preview = "";
       },
-      // ===== DOCUMENT FUNCTIONS =====
+
+      // ======================
+      // DOCUMENT (SINGLE FILE)
+      // ======================
+
       selectDocument() {
         this.$refs.documentInput.click();
       },
 
       onDocumentChange(event) {
-        const files = event.target.files;
-        if (!files.length) return;
+        const file = event.target.files[0];
+        if (!file) return;
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-
-          this.documents.push({
-            file: file,
-            name: file.name,
-            type: file.type,
-            preview: URL.createObjectURL(file),
-          });
-        }
-
-        event.target.value = "";
+        this.document = {
+          file: file,
+          name: file.name,
+          type: file.type,
+          preview: URL.createObjectURL(file),
+        };
       },
 
-      removeDocument(index) {
-        this.documents.splice(index, 1);
+      removeDocument() {
+        this.document = null;
       },
     },
   });

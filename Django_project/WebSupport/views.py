@@ -9,10 +9,34 @@ from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from django.db import transaction
 from django.contrib import messages
+from django.http import JsonResponse
 
 
 
 # Create your views here.
+
+# def WebSupport(request, username_com):
+
+#     company = get_object_or_404(
+#         Company.objects.select_related("company_id"),
+#         company_id__username_com=username_com
+#     )
+
+#     # Get first report of this company
+#     report = Report.objects.filter(company=company).first()
+
+#     # Get all products of this company (through report)
+#     products = Product.objects.filter(
+#         report__company=company
+#     ).select_related("report").prefetch_related("sizes")
+    
+#     documents = CollabDocument.objects.filter(report__company=company)
+
+#     return render(request, "home.html", {
+#         "company": company,
+#         "report": report,
+#         "products": products
+#     })
 
 def WebSupport(request, username_com):
 
@@ -21,18 +45,14 @@ def WebSupport(request, username_com):
         company_id__username_com=username_com
     )
 
-    # Get first report of this company
-    report = Report.objects.filter(company=company).first()
-
-    # Get all products of this company (through report)
-    products = Product.objects.filter(
-        report__company=company
-    ).select_related("report").prefetch_related("sizes")
+    reports = Report.objects.filter(company=company).prefetch_related(
+    "products__sizes",
+    "documents"
+)
 
     return render(request, "home.html", {
         "company": company,
-        "report": report,
-        "products": products
+        "reports": reports
     })
 
 def info_comp(request, username_com):
@@ -122,6 +142,7 @@ def info_prod(request, company_id):
             other_collab = None
 
         ads_image = request.FILES.get("ads_image")
+        name = request.POST.get("collection_name")
 
         # ===============================
         # 3️⃣ SAVE DATA (ATOMIC)
@@ -134,6 +155,7 @@ def info_prod(request, company_id):
                 # ---------------------------
                 report = Report.objects.create(
                     company=company,
+                    name = name,
                     collab_type=collab_type,
                     other_collab=other_collab,
                     start_date=start_date,
@@ -270,3 +292,40 @@ def signup_com(request):
 #         return redirect("info_page")
 
 
+def edit_product(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+
+        detail = request.POST.get("detail")
+        image = request.FILES.get("image")
+
+        product.detail = detail
+
+        if image:
+            product.image = image
+
+        product.save()
+
+        return redirect("home", username_com=product.report.company.company_id.username_com)
+
+    return render(request, "edit_product.html", {
+        "product": product
+    })
+    
+
+
+def get_documents(request, report_id):
+
+    docs = CollabDocument.objects.filter(report_id=report_id)
+
+    data = []
+
+    for d in docs:
+        data.append({
+            "url": d.file.url,
+            "name": d.file.name.split("/")[-1]
+        })
+
+    return JsonResponse(data, safe=False)

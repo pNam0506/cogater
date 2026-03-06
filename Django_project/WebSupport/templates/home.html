@@ -1,84 +1,165 @@
-{% extends "base_web.html" %}
-
-{% block title %}
+{% extends "base_web.html" %} {% block title %}
 <title>Welcome</title>
-{% endblock %}
+{% endblock %} {% block content %}
 
-{% block content %}
-
-<style>
-
-</style>
-
-<!-- 🔹 เนื้อหาหลัก -->
-<div id="main-content">
-    <h1 class="text-center" style="font-family: 'IBM Plex Sans Thai', sans-serif;">WebSupport</h1>
-</div>
+<h1 style="text-align: center">WebSupport</h1>
 
 <div>
 
-    
-    <div class="menu">
-       <a href="{% url 'info_comp' company.company_id.username_com %}">
-            <button>Report</button>
-        </a>
-        
-        {{company}}
+<a href="{% url 'info_comp' company.company_id.username_com %}">
+<button>Report</button>
+</a>
 
-    </div>
+<h2>Company: {{ company.name }}</h2>
+{% comment %} 
+<table border="1" cellpadding="10">
 
-    <h2>Product List</h2>
+<thead>
+<tr>
+<th>Product</th>
+<th>Size</th>
+<th>Price</th>
+<th>Image</th>
+<th>Edit</th>
+<th>Documents</th>
+</tr>
+</thead>
 
-{% comment %} <table border="1">
+<tbody>
 
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Description</th>
-    </tr> {% endcomment %}
+{% for report in reports %}
+{% for product in report.products.all %}
+{% for size in product.sizes.all %}
 
- {% for report in reports %}
-  <h3>Products in Report {{ report.id }}</h3>
+<tr>
 
-  <table border="1" cellpadding="8">
-    <tr>
-      <th>Product Detail</th>
-      <th>Size</th>
-      <th>Price</th>
-    </tr>
+<td>{{ product.detail }}</td>
 
-    {% for product in report.product_set.all %}
-      {% for size in product.productsize_set.all %}
-      <tr>
-        <td>{{ product.detail }}</td>
-        <td>{{ size.size }}</td>
-        <td>{{ size.price }}</td>
-      </tr>
-      {% endfor %}
-    {% endfor %}
-  </table>
+<td>{{ size.size }}</td>
+
+<td>{{ size.price }}</td>
+
+<td>
+{% if product.image %}
+<img src="{{ product.image.url }}" width="70">
+{% endif %}
+</td>
+
+<td>
+<a href="{% url 'edit_product' product.id %}">
+<button>✏️ Edit</button>
+</a>
+</td>
+
+<td>
+
+{% for doc in report.documents.all %}
+
+<a href="{{ doc.file.url }}" target="_blank">
+📄 Document {{ forloop.counter }}
+</a>
+<br>
+
+{% empty %}
+
+No document
+
 {% endfor %}
 
+</td>
 
-    {% comment %} <tr>
+</tr>
 
-        <td>{{ company }}</td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.description }}</td>
+{% endfor %}
+{% endfor %}
+{% endfor %}
 
-    </tr> {% endcomment %}
+</tbody>
 
-   
+</table> {% endcomment %}
+
+<table border="1" cellpadding="10">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Collection Name</th>
+<th>Start Date</th>
+<th>End Date</th>
+<th>Documents</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for report in reports %}
+
+<tr>
+<td>{{ report.id }}</td>
+
+<td>{{ report.name }}</td>
+
+<td>{{ report.start_date }}</td>
+
+<td>{{ report.end_date }}</td>
+
+<td>
+
+{% for doc in report.documents.all %}
+
+<a href="{{ doc.file.url }}" target="_blank">
+📄 Document {{ forloop.counter }}
+</a>
+<br>
+
+{% empty %}
+
+No document
+
+{% endfor %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
 </table>
-    
 
 
 </div>
 
+  <script>
+    function openDocs(reportId) {
+      fetch(`/WebSupport/get_documents/${reportId}/`)
+        .then((res) => res.json())
+        .then((data) => {
+          let html = "";
 
+          data.forEach((doc) => {
+            html += `
+<div>
+<a href="${doc.url}" target="_blank">${doc.name}</a>
+</div>
+`;
+          });
 
-{% endblock %}
+          document.getElementById("docList").innerHTML = html;
+          document.getElementById("docModal").style.display = "block";
+        });
+    }
+
+    function closeDocs() {
+      document.getElementById("docModal").style.display = "none";
+    }
+
+    function closeDocs() {
+      document.getElementById("docModal").style.display = "none";
+    }
+  </script>
+
+  {% endblock %}
+</div>

@@ -47,6 +47,8 @@ class Report(models.Model):
     
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     
+    name = models.CharField(max_length=255)
+    
     COLLAB_CHOICES = [
         ('Cartoon', 'Cartoon'),
         ('Anime', 'Anime'),

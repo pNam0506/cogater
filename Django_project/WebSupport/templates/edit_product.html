@@ -1,0 +1,18 @@
+<h2>Edit Product</h2>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<label>Detail</label>
+<input type="text" name="detail" value="{{ product.detail }}">
+
+<br><br>
+
+<label>Image</label>
+<input type="file" name="image">
+
+<br><br>
+
+<button type="submit">Save</button>
+
+</form>
