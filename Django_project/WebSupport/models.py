@@ -85,6 +85,9 @@ class Report(models.Model):
     read_at = models.DateTimeField(null=True, blank=True)
     approved_at = models.DateTimeField(null=True, blank=True)
     rejected_at = models.DateTimeField(null=True, blank=True)
+    
+    reject_reason = models.TextField(null=True, blank=True)   # 👈 เพิ่ม
+
 
     def __str__(self):
         return f"Report {self.id} - {self.collab_type}"

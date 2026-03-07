@@ -37,3 +37,5 @@ class Report(models.Model):
         null=True,
         blank=True
     )
+    
+    reject_reason = models.TextField(null=True, blank=True)   # 👈 เพิ่ม

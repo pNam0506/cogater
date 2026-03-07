@@ -94,10 +94,12 @@ def reject_report(request, report_id):
 
     report = get_object_or_404(Report, id=report_id)
 
-    if report.status in ["approved", "rejected"]:
-        return redirect("report_detail", report_id=report.id)
+    if request.method == "POST":
 
-    report.status = "rejected"
-    report.save()
+        reason = request.POST.get("reject_reason")
+
+        report.status = "rejected"
+        report.reject_reason = reason
+        report.save()
 
     return redirect("report_detail", report_id=report.id)

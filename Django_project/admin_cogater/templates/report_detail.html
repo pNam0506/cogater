@@ -1,77 +1,67 @@
-{% extends "base_admin.html" %}
-
-{% block title %}
+{% extends "base_admin.html" %} {% block title %}
 <title>Report Detail</title>
-{% endblock %}
+{% endblock %} {% block content %}
 
-{% block content %}
+<div style="width: 90%; margin: auto; margin-top: 30px">
+  <h1>Report Detail</h1>
 
-<div style="width:90%;margin:auto;margin-top:30px">
+  <hr />
 
-<h1>Report Detail</h1>
+  <h2>Company</h2>
+  <p>{{ report.company.name }}</p>
 
-<hr>
+  <h2>Collection Name</h2>
+  <p>{{ report.name }}</p>
 
-<h2>Company</h2>
-<p>{{ report.company.name }}</p>
+  <h2>Collab Type</h2>
+  <p>
+    {{ report.collab_type }} {% if report.collab_type == "Other" %} - {{
+    report.other_collab }} {% endif %}
+  </p>
 
-<h2>Collection Name</h2>
-<p>{{ report.name }}</p>
+  <h2>Campaign Period</h2>
+  <p>
+    Start : {{ report.start_date }} <br />
+    End : {{ report.end_date }}
+  </p>
 
-<h2>Collab Type</h2>
-<p>
-{{ report.collab_type }}
-{% if report.collab_type == "Other" %}
- - {{ report.other_collab }}
-{% endif %}
-</p>
+  <hr />
 
-<h2>Campaign Period</h2>
-<p>
-Start : {{ report.start_date }} <br>
-End : {{ report.end_date }}
-</p>
+  <h2>Ads Image</h2>
 
-<hr>
+  {% if report.ads_image %}
+  <img src="{{ report.ads_image.url }}" width="300" />
+  {% else %}
+  <p>No image</p>
+  {% endif %}
 
-<h2>Ads Image</h2>
+  <hr />
 
-{% if report.ads_image %}
-<img src="{{ report.ads_image.url }}" width="300">
-{% else %}
-<p>No image</p>
-{% endif %}
+  <h2>Documents</h2>
 
-<hr>
+  {% for doc in report.documents.all %}
 
-<h2>Documents</h2>
+  <div>
+    <a href="{{ doc.file.url }}" target="_blank">
+      📄 Document {{ forloop.counter }}
+    </a>
+  </div>
 
-{% for doc in report.documents.all %}
+  {% empty %}
 
-<div>
-<a href="{{ doc.file.url }}" target="_blank">
-📄 Document {{ forloop.counter }}
-</a>
-</div>
+  <p>No documents</p>
 
-{% empty %}
+  {% endfor %}
 
-<p>No documents</p>
+  <hr />
 
-{% endfor %}
+  <h2>Products</h2>
 
-<hr>
+  {% for product in products %}
 
-<h2>Products</h2>
-
-{% for product in products %}
-
-<div style="border:1px solid #ccc;padding:10px;margin-bottom:10px">
-
-    
-
+  <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px">
     {% if product.image %}
-        <img src="{{ product.image.url }}" width="150">
+    <img src="{{ product.image.url }}" width="150" />
     {% endif %}
 
     <p><b>Detail:</b> {{ product.detail }}</p>
@@ -79,72 +69,117 @@ End : {{ report.end_date }}
     <h4>Sizes</h4>
 
     <ul>
-    {% for size in product.sizes.all %}
-        <li>
-            {{ size.size }} - {{ size.price }}
-        </li>
-    {% empty %}
-        <li>No sizes</li>
-    {% endfor %}
+      {% for size in product.sizes.all %}
+      <li>{{ size.size }} - {{ size.price }}</li>
+      {% empty %}
+      <li>No sizes</li>
+      {% endfor %}
     </ul>
+  </div>
 
-</div>
+  {% empty %}
+  <p>No products</p>
+  {% endfor %}
+  <hr />
 
-{% empty %}
-<p>No products</p>
-{% endfor %}
-<hr>
+  <hr />
 
-<hr>
+  <div style="margin-top: 30px">
+    {% if report.status == "approved" %}
 
-<div style="margin-top:30px">
+    <button
+      disabled
+      style="
+        background: gray;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+      "
+    >
+      Already Approved
+    </button>
 
-{% if report.status == "approved" %}
+    {% elif report.status == "rejected" %}
 
-<button disabled style="background:gray;color:white;padding:10px 20px;border:none;border-radius:6px">
-Already Approved
-</button>
 
-{% elif report.status == "rejected" %}
+    <button
+      disabled
+      style="
+        background: gray;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+      "
+    >
+      Already Rejected
+    </button>
 
-<button disabled style="background:gray;color:white;padding:10px 20px;border:none;border-radius:6px">
-Already Rejected
-</button>
+    {% else %}
 
-{% else %}
+    <form
+      method="POST"
+      action="{% url 'approve_report' report.id %}"
+      onsubmit="return confirmApprove();"
+    >
+      {% csrf_token %}
+      <button
+        style="
+          background: green;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+        "
+      >
+        Approve
+      </button>
+    </form>
 
-<form method="POST" action="{% url 'approve_report' report.id %}" onsubmit="return confirmApprove()">
-{% csrf_token %}
-<button style="background:green;color:white;padding:10px 20px;border:none;border-radius:6px">
-Approve
-</button>
-</form>
+    <br />
 
-<br>
+    <form
+      method="POST"
+      action="{% url 'reject_report' report.id %}"
+      onsubmit="return confirmReject();"
+    >
+      {% csrf_token %}
 
-<form method="POST" action="{% url 'reject_report' report.id %}" onsubmit="return confirmReject()">
-{% csrf_token %}
-<button style="background:red;color:white;padding:10px 20px;border:none;border-radius:6px">
-Reject
-</button>
-</form>
+      <textarea
+        name="reject_reason"
+        placeholder="Write reason for rejection..."
+        required
+        style="width: 300px; height: 80px; margin-bottom: 10px"
+      ></textarea>
 
-{% endif %}
+      <br />
 
-</div>
+      <button
+        style="
+          background: red;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+        "
+      >
+        Reject
+      </button>
+    </form>
 
+    {% endif %}
+  </div>
 </div>
 
 <script>
-
-function confirmApprove(){
+  function confirmApprove() {
     return confirm("Are you sure you want to APPROVE this report?");
-}
+  }
 
-function confirmReject(){
+  function confirmReject() {
     return confirm("Are you sure you want to REJECT this report?");
-}
-
+  }
 </script>
 
 {% endblock %}
