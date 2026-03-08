@@ -11,6 +11,7 @@ from django.db import transaction
 from django.contrib import messages
 from django.http import JsonResponse
 from admin_cogater.models import Notification
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -363,5 +364,13 @@ def edit_report(request, report_id):
         return redirect("home", report.company.company_id.username_com)
 
     return render(request, "edit_report.html", {
+        "report": report
+    })
+    
+def reject_reason(request, report_id):
+
+    report = get_object_or_404(Report, id=report_id)
+
+    return render(request, "comment.html", {
         "report": report
     })

@@ -16,12 +16,21 @@
     margin-bottom:30px;
 }
 
+.date-group{
+    margin-top:30px;
+    margin-bottom:10px;
+    font-weight:bold;
+    color:#555;
+    border-bottom:1px solid #ddd;
+    padding-bottom:5px;
+}
+
 .notification-card{
     padding:15px;
     border-radius:8px;
     background:white;
     box-shadow:0 3px 8px rgba(0,0,0,0.08);
-    margin-bottom:15px;
+    margin-bottom:12px;
     transition:0.2s;
 }
 
@@ -72,7 +81,27 @@
 </div>
 
 
-{% for n in notifications %}
+{% regroup notifications by created_at.date as notification_list %}
+
+{% for group in notification_list %}
+
+<div class="date-group">
+
+{% if group.grouper == today %}
+📅 Today
+
+{% elif group.grouper == yesterday %}
+🌙 Yesterday
+
+{% else %}
+🗓 {{ group.grouper|date:"d/m/Y" }}
+
+{% endif %}
+
+</div>
+
+
+{% for n in group.list %}
 
 <div class="notification-card">
 
@@ -81,10 +110,12 @@
 </a>
 
 <div class="time">
-{{ n.created_at }}
+{{ n.created_at|time:"H:i" }}
 </div>
 
 </div>
+
+{% endfor %}
 
 {% empty %}
 

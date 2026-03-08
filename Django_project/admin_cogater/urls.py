@@ -11,5 +11,6 @@ urlpatterns = [
     path('reject', views.reject, name='reject'),
     path('approve', views.approve, name='approve'),
     path('new', views.new, name='new'),
+    path('check-new-reports/',views.check_new_reports,name='check_new_reports'),
    
 ]

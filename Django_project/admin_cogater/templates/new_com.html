@@ -5,61 +5,126 @@
 <style>
 
 .container{
-    max-width:900px;
-    margin:auto;
-    font-family:Arial, Helvetica, sans-serif;
+max-width:900px;
+margin:auto;
+font-family:Arial, Helvetica, sans-serif;
 }
 
 .title{
-    text-align:center;
-    font-size:28px;
-    margin-bottom:30px;
+text-align:center;
+font-size:30px;
+margin-bottom:30px;
 }
 
+/* date group */
+
+.date-group{
+margin-top:25px;
+margin-bottom:10px;
+font-weight:bold;
+color:#666;
+border-bottom:1px solid #ddd;
+padding-bottom:5px;
+}
+
+/* notification card */
+
 .notification-card{
-    padding:15px;
-    border-radius:8px;
-    background:white;
-    box-shadow:0 3px 8px rgba(0,0,0,0.08);
-    margin-bottom:15px;
-    transition:0.2s;
+background:white;
+padding:18px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+margin-bottom:15px;
+transition:0.25s;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
 .notification-card:hover{
-    transform:scale(1.02);
-    background:#f8f9fa;
+transform:translateY(-3px);
+box-shadow:0 8px 18px rgba(0,0,0,0.15);
+background:#f8f9fa;
 }
 
-.notification-card a{
-    text-decoration:none;
-    color:#2c3e50;
-    font-weight:bold;
+.notification-info{
+display:flex;
+flex-direction:column;
 }
 
-.empty{
-    text-align:center;
-    color:#888;
+.notification-title{
+font-size:16px;
+font-weight:bold;
+color:#2c3e50;
+text-decoration:none;
 }
 
-.back-btn{
-    display:block;
-    margin:30px auto;
-    padding:10px 20px;
-    border:none;
-    border-radius:6px;
-    background:#34495e;
-    color:white;
-    cursor:pointer;
-}
-
-.back-btn:hover{
-    background:#2c3e50;
+.notification-company{
+font-size:13px;
+color:#777;
+margin-top:3px;
 }
 
 .time{
-    font-size:12px;
-    color:#888;
-    margin-top:5px;
+font-size:12px;
+color:#aaa;
+margin-top:5px;
+}
+
+/* status */
+
+.status{
+font-size:13px;
+font-weight:bold;
+padding:5px 10px;
+border-radius:20px;
+}
+
+.sent{
+background:#fff3cd;
+color:#856404;
+}
+
+.read{
+background:#cce5ff;
+color:#004085;
+}
+
+.approved{
+background:#d4edda;
+color:#155724;
+}
+
+.rejected{
+background:#f8d7da;
+color:#721c24;
+}
+
+/* empty */
+
+.empty{
+text-align:center;
+color:#999;
+margin-top:40px;
+font-size:16px;
+}
+
+/* back button */
+
+.back-btn{
+display:block;
+margin:40px auto;
+padding:10px 25px;
+border:none;
+border-radius:6px;
+background:#34495e;
+color:white;
+cursor:pointer;
+font-size:14px;
+}
+
+.back-btn:hover{
+background:#2c3e50;
 }
 
 </style>
@@ -68,23 +133,85 @@
 <div class="container">
 
 <div class="title">
-🔔 New Notifications
+🔔 Notifications
 </div>
 
 
-{% for n in notifications %}
+{% regroup notifications by start_date as notification_list %}
 
-<div class="notification-box">
+{% for group in notification_list %}
 
-<a href="{% url 'report_detail' n.id %}">
+<div class="date-group">
+
+{% if group.grouper == today %}
+📅 Today
+
+{% elif group.grouper == yesterday %}
+🌙 Yesterday
+
+{% else %}
+🗓 {{ group.grouper|date:"d/m/Y" }}
+
+{% endif %}
+
+</div>
+
+
+{% for n in group.list %}
+
+<a href="{% url 'report_detail' n.id %}" style="text-decoration:none;">
+
+<div class="notification-card">
+
+<div class="notification-info">
+
+<div class="notification-title">
 {{ n.name }}
+</div>
+
+<div class="notification-company">
+{{ n.company.name }}
+</div>
+
+<div class="time">
+{{ n.start_date }} - {{ n.end_date }}
+</div>
+
+</div>
+
+
+<div class="status
+
+{% if n.status == 'sent' %}sent
+{% elif n.status == 'read' %}read
+{% elif n.status == 'approved' %}approved
+{% elif n.status == 'rejected' %}rejected
+{% endif %}
+">
+
+{% if n.status == "sent" %}
+🟡 New
+{% elif n.status == "read" %}
+🔵 Process
+{% elif n.status == "approved" %}
+🟢 Approved
+{% elif n.status == "rejected" %}
+🔴 Rejected
+{% endif %}
+
+</div>
+
+</div>
+
 </a>
 
-</div>
+{% endfor %}
 
 {% empty %}
 
-<p>No notifications</p>
+<div class="empty">
+🔕 No notifications yet
+</div>
 
 {% endfor %}
 

@@ -1,5 +1,6 @@
 from django.urls import path
 from WebSupport import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('home/<str:username_com>/', views.WebSupport, name='home'),
@@ -20,6 +21,8 @@ path(
     name='get_documents'
 ),
 path('report/edit/<int:report_id>/', views.edit_report, name='edit_report'),
+path("comment/<int:report_id>/", views.reject_reason, name="comment"),
+path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 
     
 ]

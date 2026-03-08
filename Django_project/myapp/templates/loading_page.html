@@ -1,100 +1,384 @@
 {% extends "base.html" %}
 
 {% block title %}
-<title>Welcome</title>
+<title>Cogater Ads Library</title>
 {% endblock %}
 
 {% block content %}
-<!-- 🔹 หน้าจอโหลด -->
+
 <div id="loader">
-    <h2>Cogater</h2>
-    <div class="bar">
-        <div class="bar-fill"></div>
-    </div>
-    <div>Welcome {{username}}</div>
-    
+<h2>Cogater</h2>
+
+<div class="bar">
+<div class="bar-fill"></div>
 </div>
 
-<!-- 🔹 เนื้อหาหลัก -->
-<div id="main-content" style="display: none;">
-    <h1 class="text-center" style="font-family: 'IBM Plex Sans Thai', sans-serif;">Cogater</h1>
-    <img style="width: 100px; height: 200px;" src="{{ image }}" alt="Profile picture">
+<div>Welcome {{username}}</div>
 </div>
 
-{% for user in users %}
-    <p>{{ user.username }}</p>
-    <p>{{ user.email }}</p>
 
-    {% if user.image %}
-        <img src="{{ user.image }}" width="120">
-    {% endif %}
+<div id="main-content" style="display:none;">
+
+<h1 class="main-title">🛍 Cogater Ads Library</h1>
+
+
+<div class="filter-area">
+
+<input id="searchInput" type="text" placeholder="Search company, report or collab">
+
+<input type="date" id="startFilter">
+
+<input type="date" id="endFilter">
+
+</div>
+
+
+{% for company, reports in grouped_reports.items %}
+
+<div class="company-section">
+
+<div class="company-header">
+
+{% if company.logo %}
+<img src="{{ company.logo.url }}" class="company-logo">
+{% endif %}
+
+<h2>{{ company.name }}</h2>
+
+</div>
+
+
+<div class="grid">
+
+{% for report in reports %}
+
+<a href="{% url 'ads_detail' username report.id %}" class="card-link">
+
+<div class="card"
+
+data-company="{{ company.name|lower }}"
+data-report="{{ report.name|lower }}"
+data-collab="{{ report.collab_type|lower }}"
+data-other="{{ report.other_collab|default:''|lower }}"
+data-start="{{ report.start_date|date:'Y-m-d' }}"
+data-end="{{ report.end_date|date:'Y-m-d' }}"
+
+>
+
+{% if report.ads_image %}
+<img src="{{ report.ads_image.url }}" class="card-img">
+{% endif %}
+
+<div class="card-body">
+
+<h4>{{ report.name }}</h4>
+
+<p class="description">
+{{ report.description }}
+</p>
+
+<p class="collab">
+{{ report.collab_type }}
+
+{% if report.other_collab %}
+({{ report.other_collab }})
+{% endif %}
+</p>
+
+<p class="date">
+{{ report.start_date }} - {{ report.end_date }}
+</p>
+
+<div class="card-footer">
+
+{% if report.image %}
+<img src="{{ report.image.url }}" class="profile-img">
+{% endif %}
+
+<button class="like-btn">🤍</button>
+
+</div>
+
+</div>
+
+</div>
+
+</a>
+
 {% endfor %}
 
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
 <style>
-    /* 🔸 หน้าจอโหลดเต็มจอ */
-    #loader {
-        position: fixed;
-        inset: 0;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        z-index: 9999;
-        transition: opacity 0.6s ease;
-    }
 
-    .bar {
-        width: 300px;
-        height: 30px;
-        background: #eee;
-        border-radius: 5px;
-        overflow: hidden;
-        margin-top: 10px;
-    }
+.main-title{
+text-align:center;
+font-size:40px;
+margin-bottom:30px;
+}
 
-    .bar-fill {
-        width: 0%;
-        height: 100%;
-        background: linear-gradient(90deg, #73dc36);
-        animation: load 2s linear forwards;
-    }
+.filter-area{
+display:flex;
+gap:10px;
+justify-content:center;
+margin-bottom:40px;
+flex-wrap:wrap;
+}
 
-    @keyframes load {
-        from {
-            width: 0%;
-        }
+.filter-area input{
+padding:10px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+}
 
-        to {
-            width: 100%;
-        }
-    }
+.card-link{
+text-decoration:none;
+color:inherit;
+display:block;
+}
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
+.company-header{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+}
 
-        to {
-            opacity: 1;
-        }
-    }
+.company-logo{
+width:40px;
+height:40px;
+border-radius:50%;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:25px;
+}
+
+.card{
+background:white;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+transition:0.25s;
+}
+
+.card:hover{
+transform:translateY(-8px);
+box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+
+.card-img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.card-body{
+padding:15px;
+}
+
+.description{
+font-size:14px;
+color:#555;
+margin-bottom:10px;
+}
+
+.collab{
+font-size:13px;
+color:#777;
+}
+
+.date{
+font-size:12px;
+color:#aaa;
+margin-bottom:10px;
+}
+
+.card-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.profile-img{
+width:35px;
+height:35px;
+border-radius:50%;
+}
+
+.like-btn{
+border:none;
+background:none;
+font-size:22px;
+cursor:pointer;
+}
+
+#loader{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+
+.bar{
+width:300px;
+height:30px;
+background:#eee;
+border-radius:5px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.bar-fill{
+width:0%;
+height:100%;
+background:linear-gradient(90deg,#73dc36);
+animation:load 2s linear forwards;
+}
+
+@keyframes load{
+from{width:0%;}
+to{width:100%;}
+}
+
 </style>
 
-<script>
-    // 🔸 เมื่อโหลดหน้าเสร็จ
-    window.addEventListener("load", function () {
-        const loader = document.getElementById("loader");
-        const main = document.getElementById("main-content");
 
-        setTimeout(() => {
-            loader.style.opacity = "0";
-            setTimeout(() => {
-                loader.style.display = "none";
-                main.style.display = "block";
-                main.style.animation = "fadeIn 1s ease";
-            }, 600);
-        }, 2000); // แสดงโหลดประมาณ 2 วิ
-    });
+<script>
+
+/* loader */
+
+window.addEventListener("load",function(){
+
+const loader=document.getElementById("loader")
+const main=document.getElementById("main-content")
+
+setTimeout(()=>{
+
+loader.style.display="none"
+main.style.display="block"
+
+},2000)
+
+})
+
+
+/* like toggle */
+
+document.querySelectorAll(".like-btn").forEach(btn=>{
+
+btn.addEventListener("click",function(e){
+
+e.preventDefault()
+
+if(this.innerText==="🤍"){
+this.innerText="❤️"
+}else{
+this.innerText="🤍"
+}
+
+})
+
+})
+
+
+const searchInput=document.getElementById("searchInput")
+const startFilter=document.getElementById("startFilter")
+const endFilter=document.getElementById("endFilter")
+
+
+function filterAds(){
+
+const keyword=searchInput.value.toLowerCase()
+
+const startDate=startFilter.value
+const endDate=endFilter.value
+
+
+document.querySelectorAll(".company-section").forEach(section=>{
+
+let cards=section.querySelectorAll(".card")
+let visible=0
+
+cards.forEach(card=>{
+
+let company=card.dataset.company
+let report=card.dataset.report
+let collab=card.dataset.collab
+let other=card.dataset.other
+
+let start=new Date(card.dataset.start)
+let end=new Date(card.dataset.end)
+
+let matchKeyword=
+
+company.includes(keyword) ||
+report.includes(keyword) ||
+collab.includes(keyword) ||
+other.includes(keyword)
+
+let matchDate=true
+
+if(startDate){
+
+let startFilterDate=new Date(startDate)
+
+if(end < startFilterDate){
+matchDate=false
+}
+
+}
+
+if(endDate){
+
+let endFilterDate=new Date(endDate)
+
+if(start > endFilterDate){
+matchDate=false
+}
+
+}
+
+if(matchKeyword && matchDate){
+
+card.closest(".card-link").style.display="block"
+visible++
+
+}else{
+
+card.closest(".card-link").style.display="none"
+
+}
+
+})
+
+section.style.display = visible ? "block" : "none"
+
+})
+
+}
+
+
+searchInput.addEventListener("input",filterAds)
+
+startFilter.addEventListener("change",filterAds)
+
+endFilter.addEventListener("change",filterAds)
+
 </script>
+
 {% endblock %}

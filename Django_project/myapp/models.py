@@ -18,5 +18,7 @@ class User(models.Model):
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)  # ← ฟิลด์เก็บรูป
     password = models.CharField(max_length=100)
     
+    approved = models.BooleanField(default=False)
+    
     def __str__(self):
         return self.username

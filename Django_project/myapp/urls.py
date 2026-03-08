@@ -7,8 +7,9 @@ urlpatterns = [
     path('form',views.form),
     path('edit/<person_id>',views.edit),
     path('delete/<person_id>',views.delete),
-    path('home/<str:username>/',views.info, name='user_profile'),
+    path('home/<str:username>/',views.home, name='user_profile'),
     path('login/', views.loginView, name="login"),
     path('signup/', views.authView, name='signup'),
+    path('home/<str:username>/ads/<int:id>/', views.ads_detail, name='ads_detail')
    
 ]

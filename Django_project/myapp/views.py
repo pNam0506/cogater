@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 #ส่งข้อความตอบกลับไปยังหน้าเว็บ
 from django.http import HttpResponse
 from .models import Person, User
+from WebSupport.models import *
 from django.contrib import messages
 from time import sleep
 from django.contrib.auth.forms import UserCreationForm
@@ -11,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password  # ใช้เข้ารหัสรหัสผ่าน
 from django.contrib.auth.hashers import check_password
+from collections import defaultdict
 # Create your views here.
 def index(request):
     all_person = Person.objects.filter(name = "น้ำ")
@@ -73,25 +75,38 @@ def loading(request, username):
             "image": image
         })
 
-def info(request, username):
+# def info(request, username):
 
-    users = User.objects.filter(username=username)
+#     users = User.objects.filter(username=username)
 
-    user_list = []
-    for u in users:
-        image = u.image.url if hasattr(u, "image") and u.image else None
+#     user_list = []
+#     for u in users:
+#         image = u.image.url if hasattr(u, "image") and u.image else None
         
-        user_list.append({
-            "username": u.username,
-            "email": u.email,
-            "image": image,
-        })
+#         user_list.append({
+#             "username": u.username,
+#             "email": u.email,
+#             "image": image,
+#         })
+
+#     return render(request, "loading_page.html", {
+#         "users": user_list,
+#         "image": image,
+#     })
+
+def home(request, username):
+
+    reports = Report.objects.filter(status="approved")
+
+    grouped_reports = defaultdict(list)
+
+    for r in reports:
+        grouped_reports[r.company].append(r)
 
     return render(request, "loading_page.html", {
-        "users": user_list,
-        "image": image,
+        "grouped_reports": dict(grouped_reports),
+        "username": username
     })
-
 
 from django.shortcuts import render, redirect
 
@@ -147,3 +162,16 @@ def authView(request):
         return redirect("user_profile", username=user.username)  # ไปหน้าโปรไฟล์หลังสมัคร
 
     return render(request, "signup.html")
+
+def ads_detail(request, id, username):
+
+    report = get_object_or_404(Report, id=id)
+    
+    products = Product.objects.filter(report=report)
+
+    return render(request, "Item_detail.html", {
+        "report": report,
+        "products": products,
+        "username": username
+    })
+    

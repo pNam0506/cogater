@@ -89,8 +89,9 @@ No document
 <th>Documents</th>
 <th>Sent_date</th>
 <th>Status</th>
-<th>Action</th>
+<th>Comment</th>
 <th>result_date</th>
+<th>Action</th>
 </tr>
 </thead>
 
@@ -132,7 +133,7 @@ No document
 🟡 Sent
 
 {% elif report.status == "read" %}
-🔵 Read
+🔵 On process
 
 {% elif report.status == "approved" %}
 🟢 Approved
@@ -143,6 +144,28 @@ No document
 {% endif %}
 
 </td>
+
+<td>
+
+  {% if report.reject_reason %}
+
+<a href="{% url 'comment' report.id %}">
+View Comment
+</a>
+
+  {% endif %}
+
+</td>
+
+
+<td>
+{% if report.read_at %}
+{{ report.read_at }}
+{% else %}
+Not read yet
+{% endif %}
+</td>
+
 
 <td>
 
@@ -158,14 +181,6 @@ No document
 
 {% endif %}
 
-</td>
-
-<td>
-{% if report.read_at %}
-{{ report.read_at }}
-{% else %}
-Not read yet
-{% endif %}
 </td>
 
 </tr>

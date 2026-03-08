@@ -1,36 +1,77 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from WebSupport.models import *
+
 
 
 def approve(request):
 
-    reports = Report.objects.filter(status="approved").order_by("-approved_at")
+    reports = Report.objects.filter(
+        status="approved"
+    ).order_by("-approved_at")
 
-    return render(request, "approve.html", {
-        "reports": reports
-    })
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+
+    context = {
+        "reports": reports,
+        "today": today,
+        "yesterday": yesterday
+    }
+
+    return render(request, "approve.html", context)
+
+
 
 
 def reject(request):
 
-    reports = Report.objects.filter(status="rejected").order_by("-created_at")
+    reports = Report.objects.filter(
+        status="rejected"
+    ).order_by("-rejected_at")
 
-    return render(request, "reject.html", {
-        "reports": reports
-    })
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+
+    context = {
+        "reports": reports,
+        "today": today,
+        "yesterday": yesterday
+    }
+
+    return render(request, "reject.html", context)
 
 def read(request):
 
-    reports = Report.objects.filter(status="read").order_by("-read_at")
+    reports = Report.objects.filter(
+        status="read"
+    ).order_by("-read_at")
 
-    return render(request, "read.html", {
-        "reports": reports
-    })
-
-def new(request):
-    notifications = Report.objects.filter(status="sent").order_by('-created_at')
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
 
     context = {
-        "notifications": notifications
+        "reports": reports,
+        "today": today,
+        "yesterday": yesterday
+    }
+
+    return render(request, "read.html", context)
+
+
+def new(request):
+
+    notifications = Report.objects.filter(
+        status="sent"
+    ).order_by('-created_at')
+
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+
+    context = {
+        "notifications": notifications,
+        "today": today,
+        "yesterday": yesterday
     }
 
     return render(request, "new_com.html", context)
@@ -43,15 +84,27 @@ def dashboard(request):
 
 from .models import Notification
 
+from django.utils import timezone
+from datetime import timedelta
+
+
+
 def admin_dashboard(request):
 
-    notifications = Notification.objects.filter(is_read=False).order_by('-created_at')
+    notifications = Notification.objects.filter(
+        is_read=False
+    ).order_by('-created_at')
+
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
 
     context = {
-        "notifications": notifications
+        "notifications": notifications,
+        "today": today,
+        "yesterday": yesterday
     }
 
-    return render(request,"admin_dashboard.html",context)
+    return render(request, "admin_dashboard.html", context)
 
 from django.shortcuts import render, get_object_or_404, redirect
 from WebSupport.models import *
@@ -103,3 +156,24 @@ def reject_report(request, report_id):
         report.save()
 
     return redirect("report_detail", report_id=report.id)
+
+
+
+def check_new_reports(request):
+    count = Report.objects.filter(status="sent").count()
+    return JsonResponse({"count": count})
+
+def notifications(request):
+
+    notifications = Notification.objects.all().order_by("-created_at")
+
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+
+    context = {
+        "notifications": notifications,
+        "today": today,
+        "yesterday": yesterday
+    }
+
+    return render(request, "notifications.html", context)
